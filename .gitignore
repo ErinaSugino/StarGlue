@@ -1,0 +1,39 @@
+# Exclude local building pipeline
+build/
+build-qt/
+build-mingw/
+build-runtime/
+dist/
+dist-windows/
+dist-qt/
+enc_temp_folder/
+.cache/
+*/out/
+
+# Exclude original game assets
+attic/
+tiled/
+assets/
+mods/*.pak
+mods/*
+scripts/
+
+# Exclude VisualStudio metadata
+*/.vs/
+*.vs/
+*.sln
+*.suo
+*.vcxproj*
+
+# Exclude CMake sub-level generated content
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps

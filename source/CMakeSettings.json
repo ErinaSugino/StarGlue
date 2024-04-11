@@ -1,0 +1,137 @@
+﻿{
+  "configurations": [
+    {
+      "name": "x64-Release",
+      "generator": "Visual Studio 17 2022 Win64",
+      "configurationType": "Release",
+      "inheritEnvironments": [ "msvc_x64_x64" ],
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "variables": [
+        {
+          "name": "ZLIB_INCLUDE_DIR",
+          "value": "${projectDir}/../lib/windows64",
+          "type": "PATH"
+        },
+        {
+          "name": "ZLIB_LIBRARY_DEBUG",
+          "value": "${projectDir}/../lib/windows64/zlib.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "ZLIB_LIBRARY_RELEASE",
+          "value": "${projectDir}/../lib/windows64/zlib.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "PNG_PNG_INCLUDE_DIR",
+          "value": "${projectDir}/../lib/windows64/include",
+          "type": "PATH"
+        },
+        {
+          "name": "PNG_LIBRARY_RELEASE",
+          "value": "${projectDir}/../lib/windows64/libpng16.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "PNG_LIBRARY_DEBUG",
+          "value": "${projectDir}/../lib/windows64/libpng16.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "FREETYPE_INCLUDE_DIR_freetype2",
+          "value": "${projectDir}/../lib/windows64/include",
+          "type": "PATH"
+        },
+        {
+          "name": "FREETYPE_INCLUDE_DIR_ft2build",
+          "value": "${projectDir}/../lib/windows64/include",
+          "type": "PATH"
+        },
+        {
+          "name": "FREETYPE_LIBRARY_DEBUG",
+          "value": "${projectDir}/../lib/windows64/freetype.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "FREETYPE_LIBRARY_RELEASE",
+          "value": "${projectDir}/../lib/windows64/freetype.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "OGG_LIBRARY",
+          "value": "${projectDir}/../lib/windows64/ogg.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "OGG_INCLUDE_DIR",
+          "value": "F:/Programme W8/Git/StarGlue/lib/windows64/include",
+          "type": "PATH"
+        },
+        {
+          "name": "VORBIS_LIBRARY",
+          "value": "${projectDir}/../lib/windows64/vorbis.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "VORBIS_INCLUDE_DIR",
+          "value": "${projectDir}/../lib/windows64/include",
+          "type": "PATH"
+        },
+        {
+          "name": "VORBISFILE_LIBRARY",
+          "value": "${projectDir}/../lib/windows64/vorbisfile.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "SDL2_INCLUDE_DIR",
+          "value": "${projectDir}/../lib/windows64/include",
+          "type": "PATH"
+        },
+        {
+          "name": "SDL2_LIBRARY_TEMP",
+          "value": "${projectDir}/../lib/windows64/SDL2.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "SDL2MAIN_LIBRARY",
+          "value": "${projectDir}/../lib/windows64/SDL2.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "GLEW_LIBRARY",
+          "value": "${projectDir}/../lib/windows64/glew32.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "GLEW_INCLUDE_DIR",
+          "value": "${projectDir}/../lib/windows64/include",
+          "type": "PATH"
+        },
+        {
+          "name": "SDL2_LIBRARY",
+          "value": "${projectDir}/../lib/windows64/SDL2.lib",
+          "type": "STRING"
+        },
+        {
+          "name": "STAR_ENABLE_STEAM_INTEGRATION",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "STEAM_API_LIBRARY",
+          "value": "${projectDir}/../lib/windows64/steam_api.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "STEAM_API_INCLUDE_DIR",
+          "value": "${projectDir}/../lib/windows64/include",
+          "type": "PATH"
+        }
+      ]
+    }
+  ]
+}

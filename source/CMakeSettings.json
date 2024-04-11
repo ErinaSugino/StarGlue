@@ -68,7 +68,7 @@
         },
         {
           "name": "OGG_INCLUDE_DIR",
-          "value": "F:/Programme W8/Git/StarGlue/lib/windows64/include",
+          "value": "${projectDir}/../lib/windows64/include",
           "type": "PATH"
         },
         {

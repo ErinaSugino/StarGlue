@@ -505,6 +505,7 @@ namespace LuaBindings {
     callbacks.registerCallbackWithSignature<Json, EntityId, Json, size_t>("containerSwapItemsNoCombine", bind(WorldEntityCallbacks::containerSwapItemsNoCombine, world, _1, _2, _3));
     callbacks.registerCallbackWithSignature<Json, EntityId, Json, size_t>("containerItemApply", bind(WorldEntityCallbacks::containerItemApply, world, _1, _2, _3));
     callbacks.registerCallbackWithSignature<Maybe<LuaValue>, EntityId, String, LuaVariadic<LuaValue>>("callScriptedEntity", bind(WorldEntityCallbacks::callScriptedEntity, world, _1, _2, _3));
+    callbacks.registerCallbackWithSignature<bool, EntityId>("isEntityMaster", bind(WorldEntityCallbacks::isEntityMaster, world, _1));
     callbacks.registerCallbackWithSignature<RpcPromise<Vec2F>, String>("findUniqueEntity", bind(WorldEntityCallbacks::findUniqueEntity, world, _1));
     callbacks.registerCallbackWithSignature<RpcPromise<Json>, LuaEngine&, LuaValue, String, LuaVariadic<Json>>("sendEntityMessage", bind(WorldEntityCallbacks::sendEntityMessage, world, _1, _2, _3, _4));
     callbacks.registerCallbackWithSignature<Maybe<bool>, EntityId>("loungeableOccupied", bind(WorldEntityCallbacks::loungeableOccupied, world, _1));
@@ -1715,6 +1716,12 @@ namespace LuaBindings {
     if (!entity || !entity->isMaster())
       throw StarException::format("Entity %s does not exist or is not a local master scripted entity", entityId);
     return entity->callScript(function, args);
+  }
+
+  bool WorldEntityCallbacks::isEntityMaster(World* world, EntityId entityId) {
+      auto entity = as<ScriptedEntity>(world->entity(entityId));
+      if (!entity || !entity->isMaster()) return false;
+      return true;
   }
 
   RpcPromise<Vec2F> WorldEntityCallbacks::findUniqueEntity(World* world, String const& uniqueId) {

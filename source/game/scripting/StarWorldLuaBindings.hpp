@@ -149,6 +149,7 @@ namespace LuaBindings {
     Json containerSwapItemsNoCombine(World* world, EntityId entityId, Json const& items, size_t offset);
     Json containerItemApply(World* world, EntityId entityId, Json const& items, size_t offset);
     Maybe<LuaValue> callScriptedEntity(World* world, EntityId entityId, String const& function, LuaVariadic<LuaValue> const& args);
+    bool isEntityMaster(World* world, EntityId entityId);
     RpcPromise<Vec2F> findUniqueEntity(World* world, String const& uniqueId);
     RpcPromise<Json> sendEntityMessage(World* world, LuaEngine& engine, LuaValue entityId, String const& message, LuaVariadic<Json> args);
     Maybe<bool> loungeableOccupied(World* world, EntityId entityId);

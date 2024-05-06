@@ -670,6 +670,10 @@ LuaCallbacks Monster::makeMonsterCallbacks() {
       m_scriptedAnimationParameters.set(move(name), move(value));
     });
 
+  callbacks.registerCallback("setPersistent", [this](bool persistent) {
+      setPersistent(persistent);
+    });
+
   return callbacks;
 }
 

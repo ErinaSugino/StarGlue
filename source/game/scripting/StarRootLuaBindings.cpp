@@ -30,6 +30,7 @@ LuaCallbacks LuaBindings::makeRootCallbacks() {
 
   auto root = Root::singletonPtr();
 
+  callbacks.registerCallbackWithSignature<bool, String>("assetExists", bind(RootCallbacks::assetExists, root, _1));
   callbacks.registerCallbackWithSignature<Json, String>("assetJson", bind(RootCallbacks::assetJson, root, _1));
   callbacks.registerCallbackWithSignature<Json, String, Json>("makeCurrentVersionedJson", bind(RootCallbacks::makeCurrentVersionedJson, root, _1, _2));
   callbacks.registerCallbackWithSignature<Json, Json, String>("loadVersionedJson", bind(RootCallbacks::loadVersionedJson, root, _1, _2));
@@ -168,6 +169,10 @@ LuaCallbacks LuaBindings::makeRootCallbacks() {
     });
 
   return callbacks;
+}
+
+bool LuaBindings::RootCallbacks::assetExists(Root* root, String const& path) {
+    root->assets()->assetExists(path);
 }
 
 Json LuaBindings::RootCallbacks::assetJson(Root* root, String const& path) {

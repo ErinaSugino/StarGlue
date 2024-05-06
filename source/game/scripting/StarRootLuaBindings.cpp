@@ -172,7 +172,7 @@ LuaCallbacks LuaBindings::makeRootCallbacks() {
 }
 
 bool LuaBindings::RootCallbacks::assetExists(Root* root, String const& path) {
-    root->assets()->assetExists(path);
+    return root->assets()->assetExists(path);
 }
 
 Json LuaBindings::RootCallbacks::assetJson(Root* root, String const& path) {

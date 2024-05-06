@@ -568,6 +568,13 @@ LuaCallbacks Monster::makeMonsterCallbacks() {
       return *m_monsterLevel;
     });
 
+  callbacks.registerCallback("parts", [this]() {
+      JsonObject res = JsonObject();
+      for (auto const& pair : m_monsterVariant.animatorPartTags)
+          res[pair.first] = pair.second;
+      return res;
+    });
+
   callbacks.registerCallback("setDamageOnTouch", [this](bool arg1) {
       m_damageOnTouch = arg1;
     });

@@ -301,6 +301,11 @@ bool NetworkedAnimator::setState(String const& stateType, String const& state, b
   }
 }
 
+bool NetworkedAnimator::transitionState(String const& stateType, String const& state) {
+    if (m_animatedParts.queueState(stateType, state)) return true;
+    return false;
+}
+
 String NetworkedAnimator::state(String const& stateType) const {
   return m_animatedParts.activeState(stateType).stateName;
 }

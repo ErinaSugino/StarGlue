@@ -81,6 +81,7 @@ public:
   // forces a state change and starts the state off at the beginning even if
   // this state is already the current state.
   bool setState(String const& stateType, String const& state, bool startNew = false);
+  bool transitionState(String const& stateType, String const& state);
   String state(String const& stateType) const;
 
   StringList parts() const;

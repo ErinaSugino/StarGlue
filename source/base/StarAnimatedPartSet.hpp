@@ -80,6 +80,7 @@ public:
   // the beginning even if no state change has occurred.  Returns true if a
   // state animation reset was done.
   bool setActiveState(String const& stateTypeName, String const& stateName, bool alwaysStart = false);
+  bool queueState(String const& stateTypeName, String const& stateName);
 
   // Restart this given state type's timer off at the beginning.
   void restartState(String const& stateTypeName);
@@ -128,6 +129,7 @@ private:
     float priority;
     bool enabled;
     String defaultState;
+    Maybe<String> queuedState;
     JsonObject stateTypeProperties;
     OrderedHashMap<String, shared_ptr<State const>> states;
 

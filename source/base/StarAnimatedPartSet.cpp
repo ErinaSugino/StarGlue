@@ -127,6 +127,15 @@ bool AnimatedPartSet::setActiveState(String const& stateTypeName, String const& 
   }
 }
 
+bool AnimatedPartSet::queueState(String const& stateTypeName, String const& stateName) {
+    auto& stateType = m_stateTypes.get(stateTypeName);
+    if (stateType.states.contains(stateName)) {
+        stateType.queuedState = stateName;
+        return true;
+    }
+    return false;
+}
+
 void AnimatedPartSet::restartState(String const& stateTypeName) {
   auto& stateType = m_stateTypes.get(stateTypeName);
   stateType.activeState.timer = 0.0f;
@@ -180,7 +189,13 @@ void AnimatedPartSet::update(float dt) {
 
     stateType.activeState.timer += dt;
     if (stateType.activeState.timer > state.cycle) {
-      if (state.animationMode == End) {
+      if (!stateType.queuedState.isNothing()) {
+        //Queued state means we transition once, as defined by a call to aniamtor.transitionState()
+        stateType.activeState.stateName = stateType.queuedState.value();
+        stateType.activeState.timer = 0.0f;
+        stateType.activeStatePointer = stateType.states.get(stateType.queuedState.value()).get();
+        stateType.queuedState.reset(); //Reset queuedState cause this is a one-time transition
+      } else if (state.animationMode == End) {
         stateType.activeState.timer = state.cycle;
       } else if (state.animationMode == Loop) {
         stateType.activeState.timer = std::fmod(stateType.activeState.timer, state.cycle);

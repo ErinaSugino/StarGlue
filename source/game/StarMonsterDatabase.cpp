@@ -381,6 +381,18 @@ void MonsterDatabase::readCommonParameters(MonsterVariant& variant) {
     });
 }
 
+bool MonsterDatabase::isUniqueMonster(String const& typeName) const {
+    auto const& monsterType = m_monsterTypes.get(typeName);
+
+    for (auto const& categoryName : monsterType.categories) {
+        for (auto const& partTypeName : monsterType.partTypes) {
+            if (m_partDirectory.get(categoryName).get(partTypeName).size() > 1) return false;
+        }
+    }
+
+    return true;
+}
+
 MonsterVariant MonsterDatabase::produceMonster(String const& typeName, uint64_t seed, Json const& uniqueParameters) const {
   RandomSource rand = RandomSource(seed);
 

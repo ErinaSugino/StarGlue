@@ -116,6 +116,8 @@ public:
 
   ColorReplaceMap colorSwap(String const& setName, uint64_t seed) const;
 
+  bool isUniqueMonster(String const& typeName) const;
+
 private:
   struct MonsterType {
     String typeName;

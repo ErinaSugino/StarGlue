@@ -575,6 +575,10 @@ LuaCallbacks Monster::makeMonsterCallbacks() {
       return res;
     });
 
+  callbacks.registerCallback("isUnique", [this]() {
+      return Root::singleton().monsterDatabase()->isUniqueMonster(m_monsterVariant.type);
+    });
+
   callbacks.registerCallback("setDamageOnTouch", [this](bool arg1) {
       m_damageOnTouch = arg1;
     });

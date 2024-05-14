@@ -58,6 +58,8 @@ HumanoidIdentity::HumanoidIdentity(Json config) {
   color = jsonToColor(config.get("color", "white")).toRgba();
 
   imagePath = config.optString("imagePath");
+  bellyImage = config.optString("bellyImage");
+  groinImage = config.optString("groinImage");
 }
 
 Json HumanoidIdentity::toJson() const {
@@ -84,6 +86,10 @@ Json HumanoidIdentity::toJson() const {
   };
   if (imagePath)
     result["imagePath"] = *imagePath;
+  if (bellyImage)
+      result["bellyImage"] = *bellyImage;
+  if (groinImage)
+      result["groinImage"] = *groinImage;
   return result;
 }
 
@@ -246,6 +252,8 @@ Humanoid::Humanoid(Json const& config) {
   m_backArmorOffset = jsonToVec2F(config.get("backArmorOffset")) / TilePixels;
 
   m_bodyHidden = config.getBool("bodyHidden", false);
+  m_allowBelly = true;
+  m_allowGroin = true;
 
   m_armWalkSeq = jsonToIntList(config.get("armWalkSeq"));
   m_armRunSeq = jsonToIntList(config.get("armRunSeq"));
@@ -297,6 +305,8 @@ void Humanoid::setIdentity(HumanoidIdentity const& identity) {
   m_identity = identity;
   m_headFrameset = getHeadFromIdentity();
   m_bodyFrameset = getBodyFromIdentity();
+  m_bellyFrameset = getBellyFromIdentity();
+  m_groinFrameset = getGroinFromIdentity();
   m_emoteFrameset = getFacialEmotesFromIdentity();
   m_hairFrameset = getHairFromIdentity();
   m_facialHairFrameset = getFacialHairFromIdentity();
@@ -364,6 +374,14 @@ void Humanoid::setLegsMaskFrameset(String legsMaskFrameset) {
 
 void Humanoid::setBodyHidden(bool hidden) {
   m_bodyHidden = hidden;
+}
+
+void Humanoid::setAllowBelly(bool allow) {
+    m_allowBelly = allow;
+}
+
+void Humanoid::setAllowGroin(bool allow) {
+    m_allowGroin = allow;
 }
 
 void Humanoid::setState(State state) {
@@ -623,6 +641,28 @@ List<Drawable> Humanoid::render() {
     else
       image = strf("%s:%s.%s%s%s%s", m_bodyFrameset, frameBase(m_state), bodyStateSeq, getBodyDirectives(), getChestMaskDirectives(frameBase(m_state), bodyStateSeq), getLegsMaskDirectives(frameBase(m_state), bodyStateSeq));
     addDrawable(Drawable::makeImage(move(image), 1.0f / TilePixels, true, {}), m_bodyFullbright);
+  }
+
+  if (!m_bellyFrameset.empty() && !m_bodyHidden && m_allowBelly) {
+      String image;
+      if (dance.isValid() && danceStep->bodyFrame)
+          image = strf("%s:%s%s", m_bellyFrameset, *danceStep->bodyFrame, getBodyDirectives());
+      else if (m_state == Idle)
+          image = strf("%s:%s%s", m_bellyFrameset, m_identity.personality.idle, getBodyDirectives());
+      else
+          image = strf("%s:%s.%s%s", m_bellyFrameset, frameBase(m_state), bodyStateSeq, getBodyDirectives());
+      addDrawable(Drawable::makeImage(move(image), 1.0f / TilePixels, true, {}), m_bodyFullbright);
+  }
+
+  if (!m_groinFrameset.empty() && !m_bodyHidden && m_allowGroin) {
+      String image;
+      if (dance.isValid() && danceStep->bodyFrame)
+          image = strf("%s:%s%s", m_groinFrameset, *danceStep->bodyFrame, getBodyDirectives());
+      else if (m_state == Idle)
+          image = strf("%s:%s%s", m_groinFrameset, m_identity.personality.idle, getBodyDirectives());
+      else
+          image = strf("%s:%s.%s%s", m_groinFrameset, frameBase(m_state), bodyStateSeq, getBodyDirectives());
+      addDrawable(Drawable::makeImage(move(image), 1.0f / TilePixels, true, {}), m_bodyFullbright);
   }
 
   if (!m_legsArmorFrameset.empty()) {
@@ -1035,6 +1075,24 @@ String Humanoid::getBodyFromIdentity() const {
   return strf("/humanoid/%s/%sbody.png",
       m_identity.imagePath ? *m_identity.imagePath : m_identity.species,
       GenderNames.getRight(m_identity.gender));
+}
+
+String Humanoid::getBellyFromIdentity() const {
+    if (m_identity.bellyImage.isNothing())
+        return "";
+    else
+        return strf("/humanoid/%s/%s.png",
+            m_identity.imagePath ? *m_identity.imagePath : m_identity.species,
+            *m_identity.bellyImage);
+}
+
+String Humanoid::getGroinFromIdentity() const {
+    if (m_identity.groinImage.isNothing())
+        return "";
+    else
+        return strf("/humanoid/%s/%s.png",
+            m_identity.imagePath ? *m_identity.imagePath : m_identity.species,
+            *m_identity.groinImage);
 }
 
 String Humanoid::getFacialEmotesFromIdentity() const {

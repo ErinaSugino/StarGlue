@@ -2004,6 +2004,18 @@ void Player::setImagePath(Maybe<String> const& imagePath) {
     m_humanoid->setIdentity(m_identity);
 }
 
+void Player::setBellyImage(Maybe<String> const& bellyImage) {
+    m_identity.bellyImage = bellyImage;
+    m_identityUpdated = true;
+    m_humanoid->setIdentity(m_identity);
+}
+
+void Player::setGroinImage(Maybe<String> const& groinImage) {
+    m_identity.groinImage = groinImage;
+    m_identityUpdated = true;
+    m_humanoid->setIdentity(m_identity);
+}
+
 HumanoidPtr Player::humanoid() {
     return m_humanoid;
 }

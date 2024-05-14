@@ -29,6 +29,8 @@ ArmorWearer::ArmorWearer() {
 
 void ArmorWearer::setupHumanoidClothingDrawables(Humanoid& humanoid, bool forceNude) const {
   bool bodyHidden = false;
+  bool allowGroin = false;
+  bool allowBelly = false;
   if (m_headCosmeticItem && !forceNude) {
     humanoid.setHeadArmorFrameset(m_headCosmeticItem->frameset(humanoid.identity().gender));
     humanoid.setHeadArmorDirectives(m_headCosmeticItem->directives());
@@ -63,6 +65,7 @@ void ArmorWearer::setupHumanoidClothingDrawables(Humanoid& humanoid, bool forceN
     humanoid.setFrontSleeveFrameset("");
     humanoid.setChestArmorFrameset("");
     humanoid.setChestMaskFrameset("");
+    allowBelly = true;
   }
 
   if (m_legsCosmeticItem && !forceNude) {
@@ -78,6 +81,7 @@ void ArmorWearer::setupHumanoidClothingDrawables(Humanoid& humanoid, bool forceN
   } else {
     humanoid.setLegsArmorFrameset("");
     humanoid.setLegsMaskFrameset("");
+    allowGroin = true;
   }
 
   if (m_backCosmeticItem && !forceNude) {
@@ -93,6 +97,8 @@ void ArmorWearer::setupHumanoidClothingDrawables(Humanoid& humanoid, bool forceN
   }
 
   humanoid.setBodyHidden(bodyHidden);
+  humanoid.setAllowBelly(allowBelly);
+  humanoid.setAllowGroin(allowGroin);
 }
 
 void ArmorWearer::effects(EffectEmitter& effectEmitter) {

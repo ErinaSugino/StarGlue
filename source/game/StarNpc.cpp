@@ -289,6 +289,28 @@ void Npc::setImagePath(Maybe<String> const& imagePath) {
     m_identityUpdated = true;
 }
 
+void Npc::setBellyImage(Maybe<String> const& bellyImage) {
+    HumanoidIdentity i = m_humanoid.identity();
+    i.bellyImage = bellyImage;
+    m_humanoid.setIdentity(i);
+
+    //Apply changes to NPCVariant too, so it will be maintained when NPC is unloaded and reloaded.
+    m_npcVariant.humanoidIdentity = i;
+
+    m_identityUpdated = true;
+}
+
+void Npc::setGroinImage(Maybe<String> const& groinImage) {
+    HumanoidIdentity i = m_humanoid.identity();
+    i.groinImage = groinImage;
+    m_humanoid.setIdentity(i);
+
+    //Apply changes to NPCVariant too, so it will be maintained when NPC is unloaded and reloaded.
+    m_npcVariant.humanoidIdentity = i;
+
+    m_identityUpdated = true;
+}
+
 String Npc::npcType() const {
   return m_npcVariant.typeName;
 }

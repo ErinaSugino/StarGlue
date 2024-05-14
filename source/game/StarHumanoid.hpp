@@ -75,6 +75,8 @@ struct HumanoidIdentity {
   Vec4B color;
 
   Maybe<String> imagePath;
+  Maybe<String> bellyImage;
+  Maybe<String> groinImage;
 };
 
 DataStream& operator>>(DataStream& ds, HumanoidIdentity& identity);
@@ -153,6 +155,8 @@ public:
   void setLegsMaskFrameset(String legsMaskFrameset);
 
   void setBodyHidden(bool hidden);
+  void setAllowBelly(bool allow);
+  void setAllowGroin(bool allow);
 
   void setState(State state);
   void setEmoteState(HumanoidEmote state);
@@ -255,6 +259,8 @@ private:
 
   String getHeadFromIdentity() const;
   String getBodyFromIdentity() const;
+  String getBellyFromIdentity() const;
+  String getGroinFromIdentity() const;
   String getFacialEmotesFromIdentity() const;
   String getHairFromIdentity() const;
   String getFacialHairFromIdentity() const;
@@ -307,6 +313,8 @@ private:
   Vec2F m_backArmorOffset;
 
   bool m_bodyHidden;
+  bool m_allowBelly;
+  bool m_allowGroin;
 
   List<int> m_armWalkSeq;
   List<int> m_armRunSeq;
@@ -321,6 +329,8 @@ private:
 
   String m_headFrameset;
   String m_bodyFrameset;
+  String m_bellyFrameset;
+  String m_groinFrameset;
   String m_backArmFrameset;
   String m_frontArmFrameset;
   String m_emoteFrameset;

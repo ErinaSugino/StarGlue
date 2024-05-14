@@ -48,6 +48,12 @@ LuaCallbacks LuaBindings::makePlayerCallbacks(Player* player) {
   callbacks.registerCallback("imagePath", [player]() { return player->identity().imagePath; });
   callbacks.registerCallback("setImagePath", [player](Maybe<String> const& imagePath) { player->setImagePath(imagePath); });
 
+  callbacks.registerCallback("bellyImage", [player]() { return player->identity().bellyImage; });
+  callbacks.registerCallback("setBellyImage", [player](Maybe<String> const& bellyImage) { player->setBellyImage(bellyImage); });
+
+  callbacks.registerCallback("groinImage", [player]() { return player->identity().groinImage; });
+  callbacks.registerCallback("setGroinImage", [player](Maybe<String> const& groinImage) { player->setGroinImage(groinImage); });
+
   callbacks.registerCallback("personality", [player]() { return player->identity().personalityJson(); });
   callbacks.registerCallback("setPersonality", [player](Json const& personalityConfig) { player->setPersonality(parsePersonality(personalityConfig)); });
 

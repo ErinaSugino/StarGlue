@@ -298,6 +298,8 @@ public:
   void setGender(Gender const& gender);
   void setPersonality(Personality const& personality);
   void setImagePath(Maybe<String> const& imagePath);
+  void setBellyImage(Maybe<String> const& bellyImage);
+  void setGroinImage(Maybe<String> const& groinImage);
   HumanoidPtr humanoid();
   HumanoidIdentity const& identity() const;
 

@@ -77,6 +77,8 @@ public:
   Gender gender() const;
   void setGender(Gender const& gender);
   void setImagePath(Maybe<String> const& imagePath);
+  void setBellyImage(Maybe<String> const& bellyImage);
+  void setGroinImage(Maybe<String> const& groinImage);
   String npcType() const;
 
   Json scriptConfigParameter(String const& parameterName, Json const& defaultValue = Json()) const;

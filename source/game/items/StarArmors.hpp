@@ -77,6 +77,8 @@ public:
   String const& backSleeveFrameset(Gender gender) const;
   String const& maskFrameset(Gender gender) const;
 
+  bool allowsBelly();
+
   virtual List<Drawable> preview(PlayerPtr const& viewer = {}) const;
 
 private:
@@ -89,6 +91,8 @@ private:
   String m_femaleFrontSleeveImage;
   String m_femaleBackSleeveImage;
   String m_femaleMaskImage;
+
+  bool m_allowsBelly;
 };
 
 class LegsArmor : public ArmorItem, public PreviewableItem {
@@ -102,6 +106,8 @@ public:
   String const& frameset(Gender gender) const;
   String const& maskFrameset(Gender gender) const;
 
+  bool allowsGroin();
+
   virtual List<Drawable> preview(PlayerPtr const& viewer = {}) const;
 
 private:
@@ -109,6 +115,8 @@ private:
   String m_femaleImage;
   String m_maleMaskImage;
   String m_femaleMaskImage;
+
+  bool m_allowsGroin;
 };
 
 class BackArmor : public ArmorItem, public PreviewableItem {

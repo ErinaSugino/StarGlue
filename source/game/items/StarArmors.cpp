@@ -130,6 +130,8 @@ ChestArmor::ChestArmor(Json const& config, String const& directory, Json const& 
   m_femaleMaskImage = femaleImages.getString("mask", "");
   if (!m_femaleMaskImage.empty() && !m_femaleMaskImage.contains("?"))
       m_femaleMaskImage = AssetPath::relativeTo(directory, m_femaleMaskImage);
+
+  m_allowsBelly = config.getBool("allowsBelly", false);
 }
 
 ItemPtr ChestArmor::clone() const {
@@ -164,6 +166,10 @@ String const& ChestArmor::maskFrameset(Gender gender) const {
         return m_femaleMaskImage;
 }
 
+bool ChestArmor::allowsBelly() {
+    return m_allowsBelly;
+}
+
 List<Drawable> ChestArmor::preview(PlayerPtr const& viewer) const {
   Gender gender = viewer ? viewer->gender() : Gender::Male;
   return Humanoid::renderDummy(gender, nullptr, this);
@@ -179,6 +185,7 @@ LegsArmor::LegsArmor(Json const& config, String const& directory, Json const& da
   m_femaleMaskImage = config.getString("femaleMask", "");
   if (!m_femaleMaskImage.empty() && !m_femaleMaskImage.contains("?"))
       m_femaleMaskImage = AssetPath::relativeTo(directory, m_femaleMaskImage);
+  m_allowsGroin = config.getBool("allowsGroin", false);
 }
 
 ItemPtr LegsArmor::clone() const {
@@ -197,6 +204,10 @@ String const& LegsArmor::maskFrameset(Gender gender) const {
         return m_maleMaskImage;
     else
         return m_femaleMaskImage;
+}
+
+bool LegsArmor::allowsGroin() {
+    return m_allowsGroin;
 }
 
 List<Drawable> LegsArmor::preview(PlayerPtr const& viewer) const {

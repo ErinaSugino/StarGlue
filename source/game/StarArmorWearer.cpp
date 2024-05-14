@@ -53,6 +53,7 @@ void ArmorWearer::setupHumanoidClothingDrawables(Humanoid& humanoid, bool forceN
     humanoid.setChestArmorDirectives(m_chestCosmeticItem->directives());
     humanoid.setChestMaskFrameset(m_chestCosmeticItem->maskFrameset(humanoid.identity().gender));
     bodyHidden = bodyHidden || m_chestCosmeticItem->hideBody();
+    allowBelly = m_chestCosmeticItem->allowsBelly();
   } else if (m_chestItem && !forceNude) {
     humanoid.setBackSleeveFrameset(m_chestItem->backSleeveFrameset(humanoid.identity().gender));
     humanoid.setFrontSleeveFrameset(m_chestItem->frontSleeveFrameset(humanoid.identity().gender));
@@ -60,6 +61,7 @@ void ArmorWearer::setupHumanoidClothingDrawables(Humanoid& humanoid, bool forceN
     humanoid.setChestArmorDirectives(m_chestItem->directives());
     humanoid.setChestMaskFrameset(m_chestItem->maskFrameset(humanoid.identity().gender));
     bodyHidden = bodyHidden || m_chestItem->hideBody();
+    allowBelly = m_chestItem->allowsBelly();
   } else {
     humanoid.setBackSleeveFrameset("");
     humanoid.setFrontSleeveFrameset("");
@@ -73,11 +75,13 @@ void ArmorWearer::setupHumanoidClothingDrawables(Humanoid& humanoid, bool forceN
     humanoid.setLegsArmorDirectives(m_legsCosmeticItem->directives());
     humanoid.setLegsMaskFrameset(m_legsCosmeticItem->maskFrameset(humanoid.identity().gender));
     bodyHidden = bodyHidden || m_legsCosmeticItem->hideBody();
+    allowGroin = m_legsCosmeticItem->allowsGroin();
   } else if (m_legsItem && !forceNude) {
     humanoid.setLegsArmorFrameset(m_legsItem->frameset(humanoid.identity().gender));
     humanoid.setLegsArmorDirectives(m_legsItem->directives());
     humanoid.setLegsMaskFrameset(m_legsItem->maskFrameset(humanoid.identity().gender));
     bodyHidden = bodyHidden || m_legsItem->hideBody();
+    allowGroin = m_legsItem->allowsGroin();
   } else {
     humanoid.setLegsArmorFrameset("");
     humanoid.setLegsMaskFrameset("");

@@ -804,8 +804,12 @@ List<Drawable> Humanoid::renderPortrait(PortraitMode mode) const {
   };
 
   bool dressed = !(mode == PortraitMode::FullNude || mode == PortraitMode::FullNeutralNude);
+  bool showGroin = !(mode == PortraitMode::Head || mode == PortraitMode::Bust);
 
   auto helmetMaskDirective = dressed ? getHelmetMaskDirectives() : "";
+  /*
+  * TODO: Apply new logic for body masking through armor here too.
+  */
 
   auto personality = m_identity.personality;
   if (mode == PortraitMode::FullNeutral || mode == PortraitMode::FullNeutralNude)
@@ -847,6 +851,16 @@ List<Drawable> Humanoid::renderPortrait(PortraitMode mode) const {
   if (!m_bodyFrameset.empty()) {
     String image = strf("%s:%s%s", m_bodyFrameset, personality.idle, getBodyDirectives());
     addDrawable(Drawable::makeImage(move(image), 1.0f, true, {}));
+  }
+
+  if (!m_groinFrameset.empty() && showGroin && (!dressed || m_allowGroin)) {
+      String image = strf("%s:%s%s", m_groinFrameset, personality.idle, getBodyDirectives());
+      addDrawable(Drawable::makeImage(move(image), 1.0f, true, {}));
+  }
+
+  if (!m_bellyFrameset.empty() && (!dressed || m_allowBelly)) {
+      String image = strf("%s:%s%s", m_bellyFrameset, personality.idle, getBodyDirectives());
+      addDrawable(Drawable::makeImage(move(image), 1.0f, true, {}));
   }
 
   if (mode != PortraitMode::Head) {

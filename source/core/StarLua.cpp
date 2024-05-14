@@ -1451,8 +1451,7 @@ Maybe<LuaInt> LuaDetail::asInteger(LuaValue const& v) {
       return (LuaInt)f;
     return {};
   }
-  if (v.is<LuaString>())
-    return maybeLexicalCast<LuaInt>(v.get<LuaString>().ptr());
+  
   return {};
 }
 

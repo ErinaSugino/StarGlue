@@ -354,6 +354,14 @@ void Humanoid::setHelmetMaskDirectives(String helmetMaskDirectives) {
   m_helmetMaskDirectives = move(helmetMaskDirectives);
 }
 
+void Humanoid::setChestMaskFrameset(String chestMaskFrameset) {
+    m_chestMaskFrameset = move(chestMaskFrameset);
+}
+
+void Humanoid::setLegsMaskFrameset(String legsMaskFrameset) {
+    m_legsMaskFrameset = move(legsMaskFrameset);
+}
+
 void Humanoid::setBodyHidden(bool hidden) {
   m_bodyHidden = hidden;
 }
@@ -609,11 +617,11 @@ List<Drawable> Humanoid::render() {
   if (!m_bodyFrameset.empty() && !m_bodyHidden) {
     String image;
     if (dance.isValid() && danceStep->bodyFrame)
-      image = strf("%s:%s%s", m_bodyFrameset, *danceStep->bodyFrame, getBodyDirectives());
+      image = strf("%s:%s%s%s%s", m_bodyFrameset, *danceStep->bodyFrame, getBodyDirectives(), getChestMaskDirectives(*danceStep->bodyFrame), getLegsMaskDirectives(*danceStep->bodyFrame));
     else if (m_state == Idle)
-      image = strf("%s:%s%s", m_bodyFrameset, m_identity.personality.idle, getBodyDirectives());
+      image = strf("%s:%s%s%s%s", m_bodyFrameset, m_identity.personality.idle, getBodyDirectives(), getChestMaskDirectives(m_identity.personality.idle), getLegsMaskDirectives(m_identity.personality.idle));
     else
-      image = strf("%s:%s.%s%s", m_bodyFrameset, frameBase(m_state), bodyStateSeq, getBodyDirectives());
+      image = strf("%s:%s.%s%s%s%s", m_bodyFrameset, frameBase(m_state), bodyStateSeq, getBodyDirectives(), getChestMaskDirectives(frameBase(m_state), bodyStateSeq), getLegsMaskDirectives(frameBase(m_state), bodyStateSeq));
     addDrawable(Drawable::makeImage(move(image), 1.0f / TilePixels, true, {}), m_bodyFullbright);
   }
 
@@ -1096,6 +1104,14 @@ String Humanoid::getHelmetMaskDirectives() const {
   return m_helmetMaskDirectives;
 }
 
+String Humanoid::getChestMaskFrameset() const {
+    return m_chestMaskFrameset;
+}
+
+String Humanoid::getLegsMaskFrameset() const {
+    return m_legsMaskFrameset;
+}
+
 String Humanoid::getHeadDirectives() const {
   return m_headArmorDirectives;
 }
@@ -1110,6 +1126,36 @@ String Humanoid::getLegsDirectives() const {
 
 String Humanoid::getBackDirectives() const {
   return m_backArmorDirectives;
+}
+
+String Humanoid::getChestMaskDirectives(String frameName) const {
+    String image = getChestMaskFrameset();
+    if (image.empty())
+        return "";
+    else
+        return strf("?addmask=%s:%s", image, frameName);
+}
+String Humanoid::getChestMaskDirectives(String frameName, int frameCount) const {
+    String image = getChestMaskFrameset();
+    if (image.empty())
+        return "";
+    else
+        return strf("?addmask=%s:%s.%s", image, frameName, frameCount);
+}
+
+String Humanoid::getLegsMaskDirectives(String frameName) const {
+    String image = getLegsMaskFrameset();
+    if (image.empty())
+        return "";
+    else
+        return strf("?addmask=%s:%s", image, frameName);
+}
+String Humanoid::getLegsMaskDirectives(String frameName, int frameCount) const {
+    String image = getLegsMaskFrameset();
+    if (image.empty())
+        return "";
+    else
+        return strf("?addmask=%s:%s.%s", image, frameName, frameCount);
 }
 
 int Humanoid::getArmStateSequence() const {

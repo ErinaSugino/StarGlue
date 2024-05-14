@@ -75,6 +75,7 @@ public:
   String const& frontSleeveFrameset(Gender gender) const;
   // Same as FSleeve
   String const& backSleeveFrameset(Gender gender) const;
+  String const& maskFrameset(Gender gender) const;
 
   virtual List<Drawable> preview(PlayerPtr const& viewer = {}) const;
 
@@ -82,10 +83,12 @@ private:
   String m_maleBodyImage;
   String m_maleFrontSleeveImage;
   String m_maleBackSleeveImage;
+  String m_maleMaskImage;
 
   String m_femaleBodyImage;
   String m_femaleFrontSleeveImage;
   String m_femaleBackSleeveImage;
+  String m_femaleMaskImage;
 };
 
 class LegsArmor : public ArmorItem, public PreviewableItem {
@@ -97,12 +100,15 @@ public:
 
   // Will have :idle, :duck, :walk[1-8], :run[1-8], :jump[1-4], :fall[1-4]
   String const& frameset(Gender gender) const;
+  String const& maskFrameset(Gender gender) const;
 
   virtual List<Drawable> preview(PlayerPtr const& viewer = {}) const;
 
 private:
   String m_maleImage;
   String m_femaleImage;
+  String m_maleMaskImage;
+  String m_femaleMaskImage;
 };
 
 class BackArmor : public ArmorItem, public PreviewableItem {

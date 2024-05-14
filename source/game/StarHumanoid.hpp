@@ -149,6 +149,8 @@ public:
   void setBackArmorFrameset(String backFrameset);
 
   void setHelmetMaskDirectives(String helmetMaskDirectives);
+  void setChestMaskFrameset(String chestMaskFrameset);
+  void setLegsMaskFrameset(String legsMaskFrameset);
 
   void setBodyHidden(bool hidden);
 
@@ -267,10 +269,17 @@ private:
   String getFacialHairDirectives() const;
   String getFacialMaskDirectives() const;
   String getHelmetMaskDirectives() const;
+  String getChestMaskFrameset() const;
+  String getLegsMaskFrameset() const;
   String getHeadDirectives() const;
   String getChestDirectives() const;
   String getLegsDirectives() const;
   String getBackDirectives() const;
+
+  String getChestMaskDirectives(String frameName) const;
+  String getChestMaskDirectives(String frameName, int frameCount) const;
+  String getLegsMaskDirectives(String frameName, int frameCount) const;
+  String getLegsMaskDirectives(String frameName) const;
 
   int getEmoteStateSequence() const;
   int getArmStateSequence() const;
@@ -336,6 +345,8 @@ private:
   String m_backArmorFrameset;
   String m_backArmorDirectives;
   String m_helmetMaskDirectives;
+  String m_chestMaskFrameset;
+  String m_legsMaskFrameset;
 
   State m_state;
   HumanoidEmote m_emoteState;

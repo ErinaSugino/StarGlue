@@ -119,11 +119,17 @@ ChestArmor::ChestArmor(Json const& config, String const& directory, Json const& 
   m_maleBodyImage = AssetPath::relativeTo(directory, maleImages.getString("body"));
   m_maleFrontSleeveImage = AssetPath::relativeTo(directory, maleImages.getString("frontSleeve"));
   m_maleBackSleeveImage = AssetPath::relativeTo(directory, maleImages.getString("backSleeve"));
+  m_maleMaskImage = maleImages.getString("mask", "");
+  if (!m_maleMaskImage.empty() && !m_maleMaskImage.contains("?"))
+      m_maleMaskImage = AssetPath::relativeTo(directory, m_maleMaskImage);
 
   Json femaleImages = config.get("femaleFrames");
   m_femaleBodyImage = AssetPath::relativeTo(directory, femaleImages.getString("body"));
   m_femaleFrontSleeveImage = AssetPath::relativeTo(directory, femaleImages.getString("frontSleeve"));
   m_femaleBackSleeveImage = AssetPath::relativeTo(directory, femaleImages.getString("backSleeve"));
+  m_femaleMaskImage = femaleImages.getString("mask", "");
+  if (!m_femaleMaskImage.empty() && !m_femaleMaskImage.contains("?"))
+      m_femaleMaskImage = AssetPath::relativeTo(directory, m_femaleMaskImage);
 }
 
 ItemPtr ChestArmor::clone() const {
@@ -151,6 +157,13 @@ String const& ChestArmor::backSleeveFrameset(Gender gender) const {
     return m_femaleBackSleeveImage;
 }
 
+String const& ChestArmor::maskFrameset(Gender gender) const {
+    if (gender == Gender::Male)
+        return m_maleMaskImage;
+    else
+        return m_femaleMaskImage;
+}
+
 List<Drawable> ChestArmor::preview(PlayerPtr const& viewer) const {
   Gender gender = viewer ? viewer->gender() : Gender::Male;
   return Humanoid::renderDummy(gender, nullptr, this);
@@ -160,6 +173,12 @@ LegsArmor::LegsArmor(Json const& config, String const& directory, Json const& da
   : ArmorItem(config, directory, data) {
   m_maleImage = AssetPath::relativeTo(directory, config.getString("maleFrames"));
   m_femaleImage = AssetPath::relativeTo(directory, config.getString("femaleFrames"));
+  m_maleMaskImage = config.getString("maleMask", "");
+  if (!m_maleMaskImage.empty() && !m_maleMaskImage.contains("?"))
+      m_maleMaskImage = AssetPath::relativeTo(directory, m_maleMaskImage);
+  m_femaleMaskImage = config.getString("femaleMask", "");
+  if (!m_femaleMaskImage.empty() && !m_femaleMaskImage.contains("?"))
+      m_femaleMaskImage = AssetPath::relativeTo(directory, m_femaleMaskImage);
 }
 
 ItemPtr LegsArmor::clone() const {
@@ -171,6 +190,13 @@ String const& LegsArmor::frameset(Gender gender) const {
     return m_maleImage;
   else
     return m_femaleImage;
+}
+
+String const& LegsArmor::maskFrameset(Gender gender) const {
+    if (gender == Gender::Male)
+        return m_maleMaskImage;
+    else
+        return m_femaleMaskImage;
 }
 
 List<Drawable> LegsArmor::preview(PlayerPtr const& viewer) const {

@@ -1756,7 +1756,6 @@ void Player::getNetStates(bool initial) {
 
   if (m_identityNetState.pullUpdated()) {
     m_identity = m_identityNetState.get();
-    m_identityUpdated = true;
     m_humanoid->setIdentity(m_identity);
   }
 

@@ -721,13 +721,21 @@ void NetworkedAnimator::update(float dt, DynamicTarget* dynamicTarget) {
       if (dynamicTarget) {
         dynamicTarget->clearFinishedAudio();
 
-        String persistentSoundFile = activeState.properties.value("persistentSound", "").toString();
+        Json persistentSound = activeState.properties.value("persistentSound", "");
+        String persistentSoundFile;
+        
+        if (persistentSound.isType(Json::Type::String))
+            persistentSoundFile = persistentSound.toString();
+        else
+            persistentSoundFile = Random::randValueFrom(persistentSound.toArray(), "").toString();
+        
         if (!persistentSoundFile.empty())
           persistentSoundFile = AssetPath::relativeTo(m_relativePath, persistentSoundFile);
 
         auto& activePersistentSound = dynamicTarget->statePersistentSounds[stateTypeName];
-        if (persistentSoundFile != activePersistentSound.file || !activePersistentSound.audio) {
-          activePersistentSound.file = persistentSoundFile;
+        if (persistentSound != activePersistentSound.sound || !activePersistentSound.audio) {
+          activePersistentSound.sound = move(persistentSound);
+          
           if (activePersistentSound.audio)
             activePersistentSound.audio->stop(activePersistentSound.stopRampTime);
 
@@ -743,13 +751,21 @@ void NetworkedAnimator::update(float dt, DynamicTarget* dynamicTarget) {
           }
         }
 
-        String immediateSoundFile = activeState.properties.value("immediateSound", "").toString();
+        Json immediateSound = activeState.properties.value("immediateSound", "");
+        String immediateSoundFile;
+
+        if (immediateSound.isType(Json::Type::String))
+            immediateSoundFile = immediateSound.toString();
+        else
+            immediateSoundFile = Random::randValueFrom(immediateSound.toArray(), "").toString();
+
         if (!immediateSoundFile.empty())
           immediateSoundFile = AssetPath::relativeTo(m_relativePath, immediateSoundFile);
 
         auto& activeImmediateSound = dynamicTarget->stateImmediateSounds[stateTypeName];
-        if (immediateSoundFile != activeImmediateSound.file) {
-          activeImmediateSound.file = immediateSoundFile;
+        if (immediateSound != activeImmediateSound.sound) {
+          activeImmediateSound.sound = move(immediateSound);
+          
           if (!immediateSoundFile.empty()) {
             activeImmediateSound.audio = make_shared<AudioInstance>(*Root::singleton().assets()->audio(immediateSoundFile));
             activeImmediateSound.audio->setRangeMultiplier(activeState.properties.value("immediateSoundRangeMultiplier", 1.0f).toFloat());

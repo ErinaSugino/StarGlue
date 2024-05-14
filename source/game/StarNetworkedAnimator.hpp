@@ -160,6 +160,7 @@ public:
   // Cause one time burst of all types of particles in an emitter looping around
   // burstCount times
   void burstParticleEmitter(String const& emitterName);
+  void setParticleEmitterParticles(String const& emitterName, JsonArray particles, bool network = true);
 
   bool hasLight(String const& lightName) const;
   void setLightActive(String const& lightName, bool active);
@@ -241,6 +242,7 @@ private:
     Maybe<Vec2F> rotationCenter;
 
     List<ParticleConfig> particleList;
+    NetElementData<JsonArray> networkedParticleChanges;
 
     NetElementBool active;
     NetElementUInt burstCount;
@@ -297,6 +299,8 @@ private:
   struct StateInfo {
     NetElementSize stateIndex;
     NetElementEvent startedEvent;
+    NetElementString transitionState;
+    NetElementEvent transitionEvent;
   };
 
   void setupNetStates();

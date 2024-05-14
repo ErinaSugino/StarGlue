@@ -60,6 +60,8 @@ LuaCallbacks LuaBindings::makeNetworkedAnimatorCallbacks(NetworkedAnimator* netw
       bind(&NetworkedAnimator::setParticleEmitterOffsetRegion, networkedAnimator, _1, _2));
   callbacks.registerCallbackWithSignature<void, String>(
       "burstParticleEmitter", bind(&NetworkedAnimator::burstParticleEmitter, networkedAnimator, _1));
+  callbacks.registerCallbackWithSignature<void, String, JsonArray, bool>(
+      "setParticleEmitterParticles", bind(&NetworkedAnimator::setParticleEmitterParticles, networkedAnimator, _1, _2, true));
   callbacks.registerCallbackWithSignature<void, String, bool>(
       "setLightActive", bind(&NetworkedAnimator::setLightActive, networkedAnimator, _1, _2));
   callbacks.registerCallbackWithSignature<void, String, Vec2F>(

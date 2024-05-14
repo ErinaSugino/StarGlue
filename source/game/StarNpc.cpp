@@ -267,10 +267,26 @@ Gender Npc::gender() const {
   return m_humanoid.identity().gender;
 }
 
-void Npc::setGender(Gender const& gender) { //TODO
+void Npc::setGender(Gender const& gender) {
     HumanoidIdentity i = m_humanoid.identity();
     i.gender = gender;
     m_humanoid.setIdentity(i);
+
+    //Apply changes to NPCVariant too, so it will be maintained when NPC is unloaded and reloaded.
+    m_npcVariant.humanoidIdentity = i;
+
+    m_identityUpdated = true;
+}
+
+void Npc::setImagePath(Maybe<String> const& imagePath) {
+    HumanoidIdentity i = m_humanoid.identity();
+    i.imagePath = imagePath;
+    m_humanoid.setIdentity(i);
+
+    //Apply changes to NPCVariant too, so it will be maintained when NPC is unloaded and reloaded.
+    m_npcVariant.humanoidIdentity = i;
+
+    m_identityUpdated = true;
 }
 
 String Npc::npcType() const {
@@ -591,9 +607,12 @@ LuaCallbacks Npc::makeNpcCallbacks() {
   callbacks.registerCallback("species", [this]() { return m_npcVariant.species; });
 
   callbacks.registerCallback("gender", [this]() { return GenderNames.getRight(m_humanoid.identity().gender); });
-  callbacks.registerCallback("setGender", [this](String gender) { this->setGender(GenderNames.getLeft(gender)); }); //TODO
+  callbacks.registerCallback("setGender", [this](String gender) { this->setGender(GenderNames.getLeft(gender)); });
 
   callbacks.registerCallback("humanoidIdentity", [this]() { return m_humanoid.identity().toJson(); });
+
+  callbacks.registerCallback("imagePath", [this]() { return m_humanoid.identity().imagePath; });
+  callbacks.registerCallback("setImagePath", [this](Maybe<String> const& imagePath) { this->setImagePath(imagePath); });
 
   callbacks.registerCallback("npcType", [this]() { return npcType(); });
 
@@ -819,6 +838,7 @@ void Npc::getNetStates(bool initial) {
 
   if (m_identityNetState.pullUpdated()) { //TODO
       m_humanoid.setIdentity(m_identityNetState.get());
+      m_identityUpdated = true;
   }
 }
 

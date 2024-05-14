@@ -75,7 +75,8 @@ public:
   String description() const override;
   String species() const override;
   Gender gender() const;
-  void setGender(Gender const& gender); //TODO
+  void setGender(Gender const& gender);
+  void setImagePath(Maybe<String> const& imagePath);
   String npcType() const;
 
   Json scriptConfigParameter(String const& parameterName, Json const& defaultValue = Json()) const;

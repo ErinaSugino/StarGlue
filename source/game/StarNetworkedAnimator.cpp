@@ -302,7 +302,11 @@ bool NetworkedAnimator::setState(String const& stateType, String const& state, b
 }
 
 bool NetworkedAnimator::transitionState(String const& stateType, String const& state) {
-    if (m_animatedParts.queueState(stateType, state)) return true;
+    if (m_animatedParts.queueState(stateType, state)) {
+        m_stateInfo[stateType].transitionState.set(state);
+        m_stateInfo[stateType].transitionEvent.trigger();
+        return true;
+    }
     return false;
 }
 
@@ -493,6 +497,19 @@ void NetworkedAnimator::setParticleEmitterBurstCount(String const& emitterName, 
 
 void NetworkedAnimator::burstParticleEmitter(String const& emitterName) {
   m_particleEmitters.get(emitterName).burstEvent.trigger();
+}
+
+void NetworkedAnimator::setParticleEmitterParticles(String const& emitterName, JsonArray particles, bool networked) {
+    ParticleEmitter* emitter = &m_particleEmitters.get(emitterName);
+    emitter->particleList.clear();
+    for (auto const& config : particles) {
+        auto creator = Root::singleton().particleDatabase()->particleCreator(config.get("particle"), m_relativePath);
+        unsigned count = config.getUInt("count", 1);
+        Vec2F offset = jsonToVec2F(config.get("offset", JsonArray{ 0, 0 }));
+        bool flip = config.getBool("flip", false);
+        emitter->particleList.append({ creator, count, offset, flip });
+    }
+    if(networked) emitter->networkedParticleChanges.push(particles);
 }
 
 bool NetworkedAnimator::hasLight(String const& lightName) const {
@@ -938,6 +955,8 @@ void NetworkedAnimator::setupNetStates() {
   for (auto& pair : m_stateInfo) {
     addNetElement(&pair.second.stateIndex);
     addNetElement(&pair.second.startedEvent);
+    addNetElement(&pair.second.transitionState);
+    addNetElement(&pair.second.transitionEvent);
   }
 
   for (auto& pair : m_transformationGroups) {
@@ -970,6 +989,7 @@ void NetworkedAnimator::setupNetStates() {
     addNetElement(&pair.second.offsetRegion);
     addNetElement(&pair.second.active);
     addNetElement(&pair.second.burstEvent);
+    addNetElement(&pair.second.networkedParticleChanges);
 
     pair.second.burstEvent.setIgnoreOccurrencesOnNetLoad(true);
   }
@@ -1016,11 +1036,18 @@ void NetworkedAnimator::netElementsNeedLoad(bool initial) {
   for (auto& pair : m_stateInfo) {
     if (pair.second.startedEvent.pullOccurred() || initial)
       m_animatedParts.setActiveStateIndex(pair.first, pair.second.stateIndex.get(), true);
+    if (pair.second.transitionEvent.pullOccurred() || initial)
+      m_animatedParts.queueState(pair.first, pair.second.transitionState.get());
   }
 
   for (auto& pair : m_rotationGroups) {
     if (pair.second.netImmediateEvent.pullOccurred() || initial)
       pair.second.currentAngle = pair.second.targetAngle.get();
+  }
+
+  for (auto& pair : m_particleEmitters) {
+      if (pair.second.networkedParticleChanges.pullUpdated() && !initial)
+          setParticleEmitterParticles(pair.first, pair.second.networkedParticleChanges.get(), false);
   }
 }
 

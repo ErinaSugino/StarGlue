@@ -113,6 +113,19 @@ void LuaBaseComponent::uninit() {
   m_error.reset();
 }
 
+void LuaBaseComponent::notifyUpdate() {
+    if (m_context) {
+        if (m_context->containsPath("entityUpdated")) {
+            try {
+                m_context->invokePath("entityUpdated");
+            } catch (LuaException const& e) {
+                Logger::error("Exception while calling script entityUpdated: %s", outputException(e, true));
+                m_error = String(printException(e, false));
+            }
+        }
+    }
+}
+
 bool LuaBaseComponent::initialized() const {
   return m_context.isValid();
 }

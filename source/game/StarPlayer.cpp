@@ -70,6 +70,7 @@ Player::Player(PlayerConfigPtr config, Uuid uuid) {
   setUniqueId(uuid.hex());
   m_identity = m_config->defaultIdentity;
   m_identityUpdated = true;
+  m_updateLuaContext = false;
 
   m_questManager = make_shared<QuestManager>(this);
   m_tools = make_shared<ToolUser>();
@@ -771,6 +772,10 @@ Maybe<Json> Player::receiveMessage(ConnectionId fromConnection, String const& me
   return {};
 }
 
+void Player::setUpdateLuaContext(bool b) {
+    m_updateLuaContext = b;
+}
+
 void Player::update(uint64_t) {
   if (isMaster()) {
     if (m_emoteCooldownTimer) {
@@ -812,6 +817,11 @@ void Player::update(uint64_t) {
     if (!isTeleporting()) {
       processControls();
 
+      if (m_updateLuaContext) {
+          m_companions->notifyUpdate(); // Notify of changes when necessary before calling update, to allow re-caching before updating on Lua script side.
+          m_deployment->notifyUpdate();
+      }
+      
       m_questManager->update();
       m_companions->update();
       m_deployment->update();
@@ -870,8 +880,11 @@ void Player::update(uint64_t) {
 
       m_techController->tickMaster();
 
-      for (auto& p : m_genericScriptContexts)
-        p.second->update(WorldTimestep * p.second->updateDelta());
+      for (auto& p : m_genericScriptContexts) {
+          if (m_updateLuaContext)
+              p.second->notifyUpdate();
+          p.second->update(WorldTimestep* p.second->updateDelta());
+      }
 
       if (edgeTriggeredUse) {
         if (canUseTool()) {
@@ -938,6 +951,9 @@ void Player::update(uint64_t) {
     }
 
     m_interestingObjects = m_questManager->interestingObjects();
+
+    if (m_updateLuaContext)
+        m_updateLuaContext = false;
 
   } else {
     m_netGroup.tickNetInterpolation(WorldTimestep);

@@ -118,6 +118,10 @@ void PlayerCompanions::update() {
   m_scriptComponent.update(m_scriptComponent.updateDt());
 }
 
+void PlayerCompanions::notifyUpdate() {
+    m_scriptComponent.notifyUpdate();
+}
+
 LuaCallbacks PlayerCompanions::makeCompanionsCallbacks() {
   LuaCallbacks callbacks;
 

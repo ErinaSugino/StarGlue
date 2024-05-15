@@ -44,6 +44,7 @@ public:
 
   void init(Entity* player, World* world);
   void uninit();
+  void notifyUpdate();
 
   void dismissCompanion(String const& category, Uuid const& podUuid);
 

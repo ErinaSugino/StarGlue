@@ -420,6 +420,8 @@ public:
 
   Vec2F cameraPosition();
 
+  void setUpdateLuaContext(bool b);
+
   using Entity::setTeam;
 
 private:
@@ -539,6 +541,7 @@ private:
 
   HumanoidIdentity m_identity;
   bool m_identityUpdated;
+  bool m_updateLuaContext;
 
   bool m_isAdmin;
   float m_interactRadius; // hand interact radius

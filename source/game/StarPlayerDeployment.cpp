@@ -84,6 +84,10 @@ void PlayerDeployment::update() {
   m_scriptComponent.update(m_scriptComponent.updateDt());
 }
 
+void PlayerDeployment::notifyUpdate() {
+    m_scriptComponent.notifyUpdate();
+}
+
 void PlayerDeployment::render(RenderCallback* renderCallback, Vec2F const& position) {
   for (auto drawablePair : m_scriptComponent.drawables()) {
     drawablePair.first.translate(position);

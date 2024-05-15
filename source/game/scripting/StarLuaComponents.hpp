@@ -68,6 +68,10 @@ public:
   // This calls the 'uninit' entry point on the script context before
   // destroying the context.
   void uninit();
+  // notifyUpdate will call the 'entityUpdated' entry point on the script context
+  // This will be called so Lua scripts know when the entity's core data updated
+  // so that scripts can re-cache data believed to be static.
+  void notifyUpdate();
 
   bool initialized() const;
 

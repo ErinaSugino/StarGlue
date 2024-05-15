@@ -81,6 +81,8 @@ public:
   void setGroinImage(Maybe<String> const& groinImage);
   String npcType() const;
 
+  void setUpdateLuaContext(bool b);
+
   Json scriptConfigParameter(String const& parameterName, Json const& defaultValue = Json()) const;
 
   Maybe<HitType> queryHit(DamageSource const& source) const override;
@@ -208,8 +210,9 @@ private:
 
   NetElementData<Maybe<String>> m_deathParticleBurst;
 
-  bool m_identityUpdated; // TODO
-  NetElementData<HumanoidIdentity> m_identityNetState; // TODO
+  bool m_identityUpdated;
+  NetElementData<HumanoidIdentity> m_identityNetState;
+  bool m_updateLuaContext;
 
   ActorMovementControllerPtr m_movementController;
   StatusControllerPtr m_statusController;

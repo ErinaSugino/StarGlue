@@ -38,7 +38,8 @@ Npc::Npc(NpcVariant const& npcVariant)
   m_statusText.set({});
   m_displayNametag.set(false);
 
-  m_identityUpdated = true; //TODO
+  m_identityUpdated = true;
+  m_updateLuaContext = false;
 
   auto assets = Root::singleton().assets();
 
@@ -391,11 +392,19 @@ void Npc::damagedOther(DamageNotification const& damage) {
     m_statusController->damagedOther(damage);
 }
 
+void Npc::setUpdateLuaContext(bool b) {
+    m_updateLuaContext = b;
+}
+
 void Npc::update(uint64_t) {
   if (!inWorld())
     return;
 
   if (isMaster()) {
+    if (m_updateLuaContext) {
+      m_scriptComponent.notifyUpdate(); // Notify of changes when necessary before calling update, to allow re-caching before updating on Lua script side.
+      m_updateLuaContext = false;
+    }
     m_scriptComponent.update(m_scriptComponent.updateDt());
 
     if (inConflictingLoungeAnchor())
@@ -629,12 +638,30 @@ LuaCallbacks Npc::makeNpcCallbacks() {
   callbacks.registerCallback("species", [this]() { return m_npcVariant.species; });
 
   callbacks.registerCallback("gender", [this]() { return GenderNames.getRight(m_humanoid.identity().gender); });
-  callbacks.registerCallback("setGender", [this](String gender) { this->setGender(GenderNames.getLeft(gender)); });
+  callbacks.registerCallback("setGender", [this](String gender) {
+      this->setGender(GenderNames.getLeft(gender));
+      this->setUpdateLuaContext(true);
+    });
 
   callbacks.registerCallback("humanoidIdentity", [this]() { return m_humanoid.identity().toJson(); });
 
   callbacks.registerCallback("imagePath", [this]() { return m_humanoid.identity().imagePath; });
-  callbacks.registerCallback("setImagePath", [this](Maybe<String> const& imagePath) { this->setImagePath(imagePath); });
+  callbacks.registerCallback("setImagePath", [this](Maybe<String> const& imagePath) {
+      this->setImagePath(imagePath);
+      this->setUpdateLuaContext(true);
+    });
+
+  callbacks.registerCallback("bellyImage", [this]() { return m_humanoid.identity().bellyImage; });
+  callbacks.registerCallback("setBellyImage", [this](Maybe<String> const& bellyImage) {
+      this->setBellyImage(bellyImage);
+      this->setUpdateLuaContext(true);
+    });
+
+  callbacks.registerCallback("groinImage", [this]() { return m_humanoid.identity().groinImage; });
+  callbacks.registerCallback("setGroinImage", [this](Maybe<String> const& groinImage) {
+      this->setGroinImage(groinImage);
+      this->setUpdateLuaContext(true);
+    });
 
   callbacks.registerCallback("npcType", [this]() { return npcType(); });
 
@@ -794,7 +821,7 @@ void Npc::setupNetStates() {
   m_netGroup.addNetElement(&m_humanoidStateNetState);
   m_netGroup.addNetElement(&m_humanoidEmoteStateNetState);
   m_netGroup.addNetElement(&m_humanoidDanceNetState);
-  m_netGroup.addNetElement(&m_identityNetState); //TODO
+  m_netGroup.addNetElement(&m_identityNetState);
 
   m_netGroup.addNetElement(&m_newChatMessageEvent);
   m_netGroup.addNetElement(&m_chatMessage);

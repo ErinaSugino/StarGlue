@@ -25,6 +25,10 @@ scripts/
 *.suo
 *.vcxproj*
 
+# Exclude VS Code stuff
+*/.vscode/
+*.vscode/
+
 # Exclude CMake sub-level generated content
 CMakeLists.txt.user
 CMakeCache.txt
@@ -36,4 +40,6 @@ cmake_install.cmake
 install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
-_deps
+
+# Exclude misc desktop & OS stuff
+.directory

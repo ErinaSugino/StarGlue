@@ -178,7 +178,7 @@ void ClientApplication::applicationInit(ApplicationControllerPtr appController) 
   bool borderless = configuration->get("borderless").toBool();
   bool maximized = configuration->get("maximized").toBool();
 
-  appController->setApplicationTitle(assets->json("/client.config:windowTitle").toString());
+  appController->setApplicationTitle(assets->json("/client.config:windowTitle").toString() + " - " + StarVersionString);
   appController->setVSyncEnabled(vsync);
 
   if (fullscreen)

@@ -1,17 +1,15 @@
 #include "StarApplication.hpp"
-#include "StarTime.hpp"
-#include "StarLogging.hpp"
 
 namespace Star {
 
 void Application::startup(StringList const&) {}
 
 void Application::applicationInit(ApplicationControllerPtr appController) {
-  m_appController = move(appController);
+  m_appController = std::move(appController);
 }
 
 void Application::renderInit(RendererPtr renderer) {
-  m_renderer = move(renderer);
+  m_renderer = std::move(renderer);
 }
 
 void Application::windowChanged(WindowMode, Vec2U) {}

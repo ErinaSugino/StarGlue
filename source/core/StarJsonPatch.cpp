@@ -23,7 +23,7 @@ namespace JsonPatching {
       {"remove", std::bind(applyRemoveOperation, _1, _2)},
       {"add", std::bind(applyAddOperation, _1, _2)},
       {"replace", std::bind(applyReplaceOperation, _1, _2)},
-      {"move", std::bind(applyMoveOperation, _1, _2)},
+      {"std::move", std::bind(applyMoveOperation, _1, _2)},
       {"copy", std::bind(applyCopyOperation, _1, _2)},
   };
 

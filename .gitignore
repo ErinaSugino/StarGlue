@@ -11,14 +11,6 @@ enc_temp_folder/
 */out/
 */build*/*
 
-# Exclude original game assets
-attic/
-tiled/
-assets/
-mods/*.pak
-mods/*
-scripts/
-
 # Exclude VisualStudio metadata
 */.vs/
 *.vs/

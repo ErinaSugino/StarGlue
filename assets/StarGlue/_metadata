@@ -1,0 +1,7 @@
+{
+  "author" : "The World",
+  "name" : "StarGlue Base",
+  "priority" : -9999,
+  "friendlyName" : "StarGlue Base Game Assets",
+  "requires": ["base"]
+}

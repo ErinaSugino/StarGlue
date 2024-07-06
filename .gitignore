@@ -9,6 +9,7 @@ dist-qt/
 enc_temp_folder/
 .cache/
 */out/
+*/build*/*
 
 # Exclude original game assets
 attic/

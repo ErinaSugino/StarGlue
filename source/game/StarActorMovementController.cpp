@@ -1097,7 +1097,7 @@ void ActorMovementController::doSetAnchorState(Maybe<EntityAnchorState> anchorSt
   }
 
   m_anchorState.set(anchorState);
-  m_entityAnchor = move(entityAnchor);
+  m_entityAnchor = std::move(entityAnchor);
 
   if (m_entityAnchor)
     setPosition(m_entityAnchor->position);
@@ -1207,7 +1207,7 @@ Maybe<bool> PathController::findPath(ActorMovementController& movementController
           if (!merged) {
             // try to splice the new path onto the current path
             auto& newPathStart = path.at(0);
-            for (size_t i = m_edgeIndex; i < m_path->size(); ++i) {
+            for (size_t i = m_edgeIndex; i < m_path->size(); i += 2) {
               auto& edge = m_path->at(i);
               if (edge.target.position == newPathStart.source.position) {
                 // splice the new path onto our current path up to this index
@@ -1221,7 +1221,6 @@ Maybe<bool> PathController::findPath(ActorMovementController& movementController
                 merged = true;
                 break;
               }
-              i++;
             }
           }
         }
@@ -1263,7 +1262,6 @@ Maybe<bool> PathController::findPath(ActorMovementController& movementController
   }
   return {};
 }
-
 Maybe<bool> PathController::move(ActorMovementController& movementController, ActorMovementParameters const& parameters, ActorMovementModifiers const& modifiers, bool run, float dt) {
   using namespace PlatformerAStar;
 

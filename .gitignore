@@ -9,14 +9,7 @@ dist-qt/
 enc_temp_folder/
 .cache/
 */out/
-
-# Exclude original game assets
-attic/
-tiled/
-assets/
-mods/*.pak
-mods/*
-scripts/
+*/build*/*
 
 # Exclude VisualStudio metadata
 */.vs/
@@ -24,6 +17,10 @@ scripts/
 *.sln
 *.suo
 *.vcxproj*
+
+# Exclude VS Code stuff
+*/.vscode/
+*.vscode/
 
 # Exclude CMake sub-level generated content
 CMakeLists.txt.user
@@ -36,4 +33,6 @@ cmake_install.cmake
 install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
-_deps
+
+# Exclude misc desktop & OS stuff
+.directory

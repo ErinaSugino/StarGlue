@@ -251,7 +251,7 @@ ConnectSuccessPacket::ConnectSuccessPacket() {}
 
 ConnectSuccessPacket::ConnectSuccessPacket(
     ConnectionId clientId, Uuid serverUuid, CelestialBaseInformation celestialInformation)
-  : clientId(clientId), serverUuid(move(serverUuid)), celestialInformation(move(celestialInformation)) {}
+  : clientId(clientId), serverUuid(std::move(serverUuid)), celestialInformation(std::move(celestialInformation)) {}
 
 void ConnectSuccessPacket::read(DataStream& ds) {
   ds.vuread(clientId);
@@ -267,7 +267,7 @@ void ConnectSuccessPacket::write(DataStream& ds) const {
 
 ConnectFailurePacket::ConnectFailurePacket() {}
 
-ConnectFailurePacket::ConnectFailurePacket(String reason) : reason(move(reason)) {}
+ConnectFailurePacket::ConnectFailurePacket(String reason) : reason(std::move(reason)) {}
 
 void ConnectFailurePacket::read(DataStream& ds) {
   ds.read(reason);
@@ -317,7 +317,7 @@ void UniverseTimeUpdatePacket::write(DataStream& ds) const {
 
 CelestialResponsePacket::CelestialResponsePacket() {}
 
-CelestialResponsePacket::CelestialResponsePacket(List<CelestialResponse> responses) : responses(move(responses)) {}
+CelestialResponsePacket::CelestialResponsePacket(List<CelestialResponse> responses) : responses(std::move(responses)) {}
 
 void CelestialResponsePacket::read(DataStream& ds) {
   ds.read(responses);
@@ -330,7 +330,7 @@ void CelestialResponsePacket::write(DataStream& ds) const {
 PlayerWarpResultPacket::PlayerWarpResultPacket() : warpActionInvalid(false) {}
 
 PlayerWarpResultPacket::PlayerWarpResultPacket(bool success, WarpAction warpAction, bool warpActionInvalid)
-  : success(success), warpAction(move(warpAction)), warpActionInvalid(warpActionInvalid) {}
+  : success(success), warpAction(std::move(warpAction)), warpActionInvalid(warpActionInvalid) {}
 
 void PlayerWarpResultPacket::read(DataStream& ds) {
   ds.read(success);
@@ -359,7 +359,7 @@ void PlanetTypeUpdatePacket::write(DataStream& ds) const {
 
 PausePacket::PausePacket() {}
 
-PausePacket::PausePacket(bool pause) : pause(move(pause)) {}
+PausePacket::PausePacket(bool pause) : pause(std::move(pause)) {}
 
 void PausePacket::read(DataStream& ds) {
   ds.read(pause);
@@ -392,9 +392,9 @@ ClientConnectPacket::ClientConnectPacket() {}
 ClientConnectPacket::ClientConnectPacket(ByteArray assetsDigest, bool allowAssetsMismatch, Uuid playerUuid,
     String playerName, String playerSpecies, WorldChunks shipChunks, ShipUpgrades shipUpgrades,
     bool introComplete, String account)
-  : assetsDigest(move(assetsDigest)), allowAssetsMismatch(allowAssetsMismatch), playerUuid(move(playerUuid)),
-    playerName(move(playerName)), playerSpecies(move(playerSpecies)), shipChunks(move(shipChunks)),
-    shipUpgrades(move(shipUpgrades)), introComplete(move(introComplete)), account(move(account)) {}
+  : assetsDigest(std::move(assetsDigest)), allowAssetsMismatch(allowAssetsMismatch), playerUuid(std::move(playerUuid)),
+    playerName(std::move(playerName)), playerSpecies(std::move(playerSpecies)), shipChunks(std::move(shipChunks)),
+    shipUpgrades(std::move(shipUpgrades)), introComplete(std::move(introComplete)), account(std::move(account)) {}
 
 void ClientConnectPacket::read(DataStream& ds) {
   ds.read(assetsDigest);
@@ -446,7 +446,7 @@ void HandshakeResponsePacket::write(DataStream& ds) const {
 
 PlayerWarpPacket::PlayerWarpPacket() {}
 
-PlayerWarpPacket::PlayerWarpPacket(WarpAction action, bool deploy) : action(move(action)), deploy(move(deploy)) {}
+PlayerWarpPacket::PlayerWarpPacket(WarpAction action, bool deploy) : action(std::move(action)), deploy(std::move(deploy)) {}
 
 void PlayerWarpPacket::read(DataStream& ds) {
   ds.read(action);
@@ -460,7 +460,7 @@ void PlayerWarpPacket::write(DataStream& ds) const {
 
 FlyShipPacket::FlyShipPacket() {}
 
-FlyShipPacket::FlyShipPacket(Vec3I system, SystemLocation location) : system(move(system)), location(move(location)) {}
+FlyShipPacket::FlyShipPacket(Vec3I system, SystemLocation location) : system(std::move(system)), location(std::move(location)) {}
 
 void FlyShipPacket::read(DataStream& ds) {
   ds.read(system);
@@ -474,7 +474,7 @@ void FlyShipPacket::write(DataStream& ds) const {
 
 ChatSendPacket::ChatSendPacket() : sendMode(ChatSendMode::Broadcast) {}
 
-ChatSendPacket::ChatSendPacket(String text, ChatSendMode sendMode) : text(move(text)), sendMode(sendMode) {}
+ChatSendPacket::ChatSendPacket(String text, ChatSendMode sendMode) : text(std::move(text)), sendMode(sendMode) {}
 
 void ChatSendPacket::read(DataStream& ds) {
   ds.read(text);
@@ -488,7 +488,7 @@ void ChatSendPacket::write(DataStream& ds) const {
 
 CelestialRequestPacket::CelestialRequestPacket() {}
 
-CelestialRequestPacket::CelestialRequestPacket(List<CelestialRequest> requests) : requests(move(requests)) {}
+CelestialRequestPacket::CelestialRequestPacket(List<CelestialRequest> requests) : requests(std::move(requests)) {}
 
 void CelestialRequestPacket::read(DataStream& ds) {
   ds.read(requests);
@@ -500,7 +500,7 @@ void CelestialRequestPacket::write(DataStream& ds) const {
 
 ClientContextUpdatePacket::ClientContextUpdatePacket() {}
 
-ClientContextUpdatePacket::ClientContextUpdatePacket(ByteArray updateData) : updateData(move(updateData)) {}
+ClientContextUpdatePacket::ClientContextUpdatePacket(ByteArray updateData) : updateData(std::move(updateData)) {}
 
 void ClientContextUpdatePacket::read(DataStream& ds) {
   ds.read(updateData);
@@ -580,7 +580,7 @@ void WorldParametersUpdatePacket::write(DataStream& ds) const {
 
 CentralStructureUpdatePacket::CentralStructureUpdatePacket() {}
 
-CentralStructureUpdatePacket::CentralStructureUpdatePacket(Json structureData) : structureData(move(structureData)) {}
+CentralStructureUpdatePacket::CentralStructureUpdatePacket(Json structureData) : structureData(std::move(structureData)) {}
 
 void CentralStructureUpdatePacket::read(DataStream& ds) {
   ds.read(structureData);
@@ -694,7 +694,7 @@ void GiveItemPacket::write(DataStream& ds) const {
 EnvironmentUpdatePacket::EnvironmentUpdatePacket() {}
 
 EnvironmentUpdatePacket::EnvironmentUpdatePacket(ByteArray skyDelta, ByteArray weatherDelta)
-  : skyDelta(move(skyDelta)), weatherDelta(move(weatherDelta)) {}
+  : skyDelta(std::move(skyDelta)), weatherDelta(std::move(weatherDelta)) {}
 
 void EnvironmentUpdatePacket::read(DataStream& ds) {
   ds.read(skyDelta);
@@ -725,7 +725,7 @@ DamageTileGroupPacket::DamageTileGroupPacket() : layer(TileLayer::Foreground) {}
 
 DamageTileGroupPacket::DamageTileGroupPacket(
     List<Vec2I> tilePositions, TileLayer layer, Vec2F sourcePosition, TileDamage tileDamage, Maybe<EntityId> sourceEntity)
-  : tilePositions(move(tilePositions)), layer(layer), sourcePosition(sourcePosition), tileDamage(move(tileDamage)), sourceEntity(move(sourceEntity)) {}
+  : tilePositions(std::move(tilePositions)), layer(layer), sourcePosition(sourcePosition), tileDamage(std::move(tileDamage)), sourceEntity(std::move(sourceEntity)) {}
 
 void DamageTileGroupPacket::read(DataStream& ds) {
   ds.readContainer(tilePositions);
@@ -746,7 +746,7 @@ void DamageTileGroupPacket::write(DataStream& ds) const {
 CollectLiquidPacket::CollectLiquidPacket() {}
 
 CollectLiquidPacket::CollectLiquidPacket(List<Vec2I> tilePositions, LiquidId liquidId)
-  : tilePositions(move(tilePositions)), liquidId(liquidId) {}
+  : tilePositions(std::move(tilePositions)), liquidId(liquidId) {}
 
 void CollectLiquidPacket::read(DataStream& ds) {
   ds.readContainer(tilePositions);
@@ -775,7 +775,7 @@ void RequestDropPacket::write(DataStream& ds) const {
 SpawnEntityPacket::SpawnEntityPacket() {}
 
 SpawnEntityPacket::SpawnEntityPacket(EntityType entityType, ByteArray storeData, ByteArray firstNetState)
-  : entityType(entityType), storeData(move(storeData)), firstNetState(move(firstNetState)) {}
+  : entityType(entityType), storeData(std::move(storeData)), firstNetState(std::move(firstNetState)) {}
 
 void SpawnEntityPacket::read(DataStream& ds) {
   ds.read(entityType);
@@ -827,7 +827,7 @@ EntityCreatePacket::EntityCreatePacket() {
 
 ServerDisconnectPacket::ServerDisconnectPacket() {}
 
-ServerDisconnectPacket::ServerDisconnectPacket(String reason) : reason(move(reason)) {}
+ServerDisconnectPacket::ServerDisconnectPacket(String reason) : reason(std::move(reason)) {}
 
 void ServerDisconnectPacket::read(DataStream& ds) {
   ds.read(reason);
@@ -885,7 +885,7 @@ void WorldClientStateUpdatePacket::write(DataStream& ds) const {
 FindUniqueEntityPacket::FindUniqueEntityPacket() {}
 
 FindUniqueEntityPacket::FindUniqueEntityPacket(String uniqueEntityId)
-  : uniqueEntityId(move(uniqueEntityId)) {}
+  : uniqueEntityId(std::move(uniqueEntityId)) {}
 
 void FindUniqueEntityPacket::read(DataStream& ds) {
   ds.read(uniqueEntityId);
@@ -920,7 +920,7 @@ void PingPacket::write(DataStream& ds) const {
 }
 
 EntityCreatePacket::EntityCreatePacket(EntityType entityType, ByteArray storeData, ByteArray firstNetState, EntityId entityId)
-  : entityType(entityType), storeData(move(storeData)), firstNetState(move(firstNetState)), entityId(entityId) {}
+  : entityType(entityType), storeData(std::move(storeData)), firstNetState(std::move(firstNetState)), entityId(entityId) {}
 
 void EntityCreatePacket::read(DataStream& ds) {
   ds.read(entityType);
@@ -961,7 +961,7 @@ EntityDestroyPacket::EntityDestroyPacket() {
 }
 
 EntityDestroyPacket::EntityDestroyPacket(EntityId entityId, ByteArray finalNetState, bool death)
-  : entityId(entityId), finalNetState(move(finalNetState)), death(death) {}
+  : entityId(entityId), finalNetState(std::move(finalNetState)), death(death) {}
 
 void EntityDestroyPacket::read(DataStream& ds) {
   ds.viread(entityId);
@@ -977,7 +977,7 @@ void EntityDestroyPacket::write(DataStream& ds) const {
 
 HitRequestPacket::HitRequestPacket() {}
 
-HitRequestPacket::HitRequestPacket(RemoteHitRequest remoteHitRequest) : remoteHitRequest(move(remoteHitRequest)) {}
+HitRequestPacket::HitRequestPacket(RemoteHitRequest remoteHitRequest) : remoteHitRequest(std::move(remoteHitRequest)) {}
 
 void HitRequestPacket::read(DataStream& ds) {
   ds.read(remoteHitRequest);
@@ -990,7 +990,7 @@ void HitRequestPacket::write(DataStream& ds) const {
 DamageRequestPacket::DamageRequestPacket() {}
 
 DamageRequestPacket::DamageRequestPacket(RemoteDamageRequest remoteDamageRequest)
-  : remoteDamageRequest(move(remoteDamageRequest)) {}
+  : remoteDamageRequest(std::move(remoteDamageRequest)) {}
 
 void DamageRequestPacket::read(DataStream& ds) {
   ds.read(remoteDamageRequest);
@@ -1003,7 +1003,7 @@ void DamageRequestPacket::write(DataStream& ds) const {
 DamageNotificationPacket::DamageNotificationPacket() {}
 
 DamageNotificationPacket::DamageNotificationPacket(RemoteDamageNotification remoteDamageNotification)
-  : remoteDamageNotification(move(remoteDamageNotification)) {}
+  : remoteDamageNotification(std::move(remoteDamageNotification)) {}
 
 void DamageNotificationPacket::read(DataStream& ds) {
   ds.read(remoteDamageNotification);
@@ -1016,7 +1016,7 @@ void DamageNotificationPacket::write(DataStream& ds) const {
 EntityMessagePacket::EntityMessagePacket() {}
 
 EntityMessagePacket::EntityMessagePacket(Variant<EntityId, String> entityId, String message, JsonArray args, Uuid uuid, ConnectionId fromConnection)
-  : entityId(entityId), message(move(message)), args(move(args)), uuid(uuid), fromConnection(fromConnection) {}
+  : entityId(entityId), message(std::move(message)), args(std::move(args)), uuid(uuid), fromConnection(fromConnection) {}
 
 void EntityMessagePacket::read(DataStream& ds) {
   ds.read(entityId);
@@ -1037,7 +1037,7 @@ void EntityMessagePacket::write(DataStream& ds) const {
 EntityMessageResponsePacket::EntityMessageResponsePacket() {}
 
 EntityMessageResponsePacket::EntityMessageResponsePacket(Either<String, Json> response, Uuid uuid)
-  : response(move(response)), uuid(uuid) {}
+  : response(std::move(response)), uuid(uuid) {}
 
 void EntityMessageResponsePacket::read(DataStream& ds) {
   ds.read(response);
@@ -1080,7 +1080,7 @@ void UpdateTileProtectionPacket::write(DataStream& ds) const {
 SetDungeonGravityPacket::SetDungeonGravityPacket() {}
 
 SetDungeonGravityPacket::SetDungeonGravityPacket(DungeonId dungeonId, Maybe<float> gravity)
-  : dungeonId(move(dungeonId)), gravity(move(gravity)) {}
+  : dungeonId(std::move(dungeonId)), gravity(std::move(gravity)) {}
 
 void SetDungeonGravityPacket::read(DataStream& ds) {
   ds.read(dungeonId);
@@ -1095,7 +1095,7 @@ void SetDungeonGravityPacket::write(DataStream& ds) const {
 SetDungeonBreathablePacket::SetDungeonBreathablePacket() {}
 
 SetDungeonBreathablePacket::SetDungeonBreathablePacket(DungeonId dungeonId, Maybe<bool> breathable)
-  : dungeonId(move(dungeonId)), breathable(move(breathable)) {}
+  : dungeonId(std::move(dungeonId)), breathable(std::move(breathable)) {}
 
 void SetDungeonBreathablePacket::read(DataStream& ds) {
   ds.read(dungeonId);
@@ -1124,7 +1124,7 @@ void SetPlayerStartPacket::write(DataStream& ds) const {
 FindUniqueEntityResponsePacket::FindUniqueEntityResponsePacket() {}
 
 FindUniqueEntityResponsePacket::FindUniqueEntityResponsePacket(String uniqueEntityId, Maybe<Vec2F> entityPosition)
-  : uniqueEntityId(move(uniqueEntityId)), entityPosition(move(entityPosition)) {}
+  : uniqueEntityId(std::move(uniqueEntityId)), entityPosition(std::move(entityPosition)) {}
 
 void FindUniqueEntityResponsePacket::read(DataStream& ds) {
   ds.read(uniqueEntityId);
@@ -1163,7 +1163,7 @@ void StepUpdatePacket::write(DataStream& ds) const {
 SystemWorldStartPacket::SystemWorldStartPacket() {}
 
 SystemWorldStartPacket::SystemWorldStartPacket(Vec3I location, List<ByteArray> objectStores, List<ByteArray> shipStores, pair<Uuid, SystemLocation> clientShip)
-  : location(move(location)), objectStores(move(objectStores)), shipStores(move(shipStores)), clientShip(move(clientShip)) {}
+  : location(std::move(location)), objectStores(std::move(objectStores)), shipStores(std::move(shipStores)), clientShip(std::move(clientShip)) {}
 
 void SystemWorldStartPacket::read(DataStream& ds) {
   ds.read(location);
@@ -1182,7 +1182,7 @@ void SystemWorldStartPacket::write(DataStream& ds) const {
 SystemWorldUpdatePacket::SystemWorldUpdatePacket() {}
 
 SystemWorldUpdatePacket::SystemWorldUpdatePacket(HashMap<Uuid, ByteArray> objectUpdates, HashMap<Uuid, ByteArray> shipUpdates)
-  : objectUpdates(move(objectUpdates)), shipUpdates(move(shipUpdates)) {}
+  : objectUpdates(std::move(objectUpdates)), shipUpdates(std::move(shipUpdates)) {}
 
 void SystemWorldUpdatePacket::read(DataStream& ds) {
   ds.read(objectUpdates);
@@ -1196,7 +1196,7 @@ void SystemWorldUpdatePacket::write(DataStream& ds) const {
 
 SystemObjectCreatePacket::SystemObjectCreatePacket() {}
 
-SystemObjectCreatePacket::SystemObjectCreatePacket(ByteArray objectStore) : objectStore(move(objectStore)) {}
+SystemObjectCreatePacket::SystemObjectCreatePacket(ByteArray objectStore) : objectStore(std::move(objectStore)) {}
 
 void SystemObjectCreatePacket::read(DataStream& ds) {
   ds.read(objectStore);
@@ -1208,7 +1208,7 @@ void SystemObjectCreatePacket::write(DataStream& ds) const {
 
 SystemObjectDestroyPacket::SystemObjectDestroyPacket() {}
 
-SystemObjectDestroyPacket::SystemObjectDestroyPacket(Uuid objectUuid) : objectUuid(move(objectUuid)) {}
+SystemObjectDestroyPacket::SystemObjectDestroyPacket(Uuid objectUuid) : objectUuid(std::move(objectUuid)) {}
 
 void SystemObjectDestroyPacket::read(DataStream& ds) {
   ds.read(objectUuid);
@@ -1220,7 +1220,7 @@ void SystemObjectDestroyPacket::write(DataStream& ds) const {
 
 SystemShipCreatePacket::SystemShipCreatePacket() {}
 
-SystemShipCreatePacket::SystemShipCreatePacket(ByteArray shipStore) : shipStore(move(shipStore)) {}
+SystemShipCreatePacket::SystemShipCreatePacket(ByteArray shipStore) : shipStore(std::move(shipStore)) {}
 
 void SystemShipCreatePacket::read(DataStream& ds) {
   ds.read(shipStore);
@@ -1232,7 +1232,7 @@ void SystemShipCreatePacket::write(DataStream& ds) const {
 
 SystemShipDestroyPacket::SystemShipDestroyPacket() {}
 
-SystemShipDestroyPacket::SystemShipDestroyPacket(Uuid shipUuid) : shipUuid(move(shipUuid)) {}
+SystemShipDestroyPacket::SystemShipDestroyPacket(Uuid shipUuid) : shipUuid(std::move(shipUuid)) {}
 
 void SystemShipDestroyPacket::read(DataStream& ds) {
   ds.read(shipUuid);
@@ -1245,7 +1245,7 @@ void SystemShipDestroyPacket::write(DataStream& ds) const {
 SystemObjectSpawnPacket::SystemObjectSpawnPacket() {}
 
 SystemObjectSpawnPacket::SystemObjectSpawnPacket(String typeName, Uuid uuid, Maybe<Vec2F> position, JsonObject parameters)
-  : typeName(move(typeName)), uuid(move(uuid)), position(move(position)), parameters(move(parameters)) {}
+  : typeName(std::move(typeName)), uuid(std::move(uuid)), position(std::move(position)), parameters(std::move(parameters)) {}
 
 void SystemObjectSpawnPacket::read(DataStream& ds) {
   ds.read(typeName);

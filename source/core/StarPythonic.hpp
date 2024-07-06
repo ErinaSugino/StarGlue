@@ -342,7 +342,7 @@ public:
     return *this;
   }
 
-  RangeIterator operator-=(Diff steps) const {
+  RangeIterator operator-=(Diff steps) {
     m_stop = false;
     sanity();
 
@@ -593,7 +593,7 @@ template <typename ResultContainer, typename Iterable>
 ResultContainer enumerateConstruct(Iterable&& list) {
   ResultContainer res;
   for (auto el : enumerateIterator(list))
-    res.push_back(move(el));
+    res.push_back(std::move(el));
 
   return res;
 }

@@ -1,222 +1,199 @@
-CMAKE_MINIMUM_REQUIRED (VERSION 3.5)
+CMAKE_MINIMUM_REQUIRED (VERSION 3.23)
+PROJECT (starbound VERSION 1.4.4)
 
-PROJECT (starbound)
+
+# =================================================================================================
+# -- CMake Configuration & Utilities --------------------------------------------------------------
+# =================================================================================================
+SET (CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
 SET (CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/../cmake)
 
+# -- CMake Configure / Build types ----------------------------------------------------------------
+# NOTE: We update the docstring on CMAKE_BUILD_TYPE to show what options are supported
 SET (CMAKE_CONFIGURATION_TYPES Debug RelWithAsserts RelWithDebInfo Release)
-SET (CMAKE_EXE_LINKER_FLAGS_RELWITHASSERTS "" CACHE STRING "" FORCE)
-# Update the docstring on CMAKE_BUILD_TYPE to show what options we actually
-# allow
-SET (CMAKE_BUILD_TYPE "${CMAKE_BUILD_TYPE}" CACHE STRING "Choose the type of build, options are: Debug RelWithAsserts RelWithDebInfo Release" FORCE)
+SET (CMAKE_BUILD_TYPE "${CMAKE_BUILD_TYPE}" CACHE STRING 
+    "Choose the type of build, options are: Debug RelWithAsserts RelWithDebInfo Release" FORCE
+)
 
-# Discover all the relevant environment / system information and place the
-# result in STAR_* cmake variables.
+# -- Helper Functions -----------------------------------------------------------------------------
+# Set a cmake variable to true and define a corresponding C/C++ preprosessor definition
+FUNCTION (SET_FLAG flagValue)
+    SET (${flagValue} TRUE PARENT_SCOPE)
+    ADD_COMPILE_DEFINITIONS (${flagValue})
+ENDFUNCTION ()
+# =================================================================================================
 
-# STAR_SOURCE_IDENTIFIER may be set to any string value
+
+# =================================================================================================
+# -- Environment ----------------------------------------------------------------------------------
+# -- Discover relevant environment / system information and place result in STAR_* cmake variables.
+# -- Generate flags and preprocessor definitions based on the result.
+# =================================================================================================
+# GIT HEAD SHA hash.
+# NOTE: Forces a re-configure on each git commit to update the value.
 IF (NOT DEFINED STAR_SOURCE_IDENTIFIER)
-  INCLUDE (GetGitRevisionDescription)
-  GET_GIT_HEAD_REVISION (STAR_GIT_REFSPEC STAR_GIT_HASHVAR)
-  SET (STAR_SOURCE_IDENTIFIER "${STAR_GIT_HASHVAR}")
+    INCLUDE (GetGitRevisionDescription)
+    get_git_head_revision (STAR_GIT_REFSPEC STAR_GIT_HASHVAR)
+    SET (STAR_SOURCE_IDENTIFIER "${STAR_GIT_HASHVAR}")
 ENDIF ()
 
-# Architecture identifier, like i386, x86_64 or ppc
+# Architecture identifier. (E.g. i386, x86_64 or ppc)
 IF (NOT DEFINED STAR_ARCHITECTURE)
-  INCLUDE (TargetArch)
-  TARGET_ARCHITECTURE (STAR_ARCHITECTURE)
+    INCLUDE (TargetArch)
+    TARGET_ARCHITECTURE (STAR_ARCHITECTURE)
+
+    IF (STAR_ARCHITECTURE STREQUAL "i386")
+        SET_FLAG (STAR_ARCHITECTURE_I386)
+    ELSEIF (STAR_ARCHITECTURE STREQUAL "x86_64")
+        SET_FLAG (STAR_ARCHITECTURE_X86_64)
+    ENDIF ()
 ENDIF ()
 
-# Either TRUE or FALSE
+# Endianness
 IF (NOT DEFINED STAR_LITTLE_ENDIAN)
-  INCLUDE (TestBigEndian)
-  TEST_BIG_ENDIAN (BIGENDIAN)
-  IF (NOT BIGENDIAN)
-    SET (STAR_LITTLE_ENDIAN TRUE)
-  ELSE ()
-    SET (STAR_LITTLE_ENDIAN FALSE)
-  ENDIF ()
+    INCLUDE (TestBigEndian)
+    TEST_BIG_ENDIAN (BIGENDIAN)
+    IF (NOT BIGENDIAN)
+        SET (STAR_LITTLE_ENDIAN TRUE)
+        SET_FLAG (STAR_LITTLE_ENDIAN)
+    ELSE ()
+        SET (STAR_LITTLE_ENDIAN FALSE)
+        SET_FLAG (STAR_BIG_ENDIAN)
+    ENDIF ()
 ENDIF ()
 
-# System name, like windows, macos, linux, freebsd, or (generic) unix
-IF (NOT DEFINED STAR_SYSTEM)
-  IF (WIN32)
-    SET (STAR_SYSTEM "windows")
-  ELSEIF (APPLE AND ${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
-    SET (STAR_SYSTEM "macos")
-  ELSEIF (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-    SET (STAR_SYSTEM "linux")
-  ELSEIF (${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
-    SET (STAR_SYSTEM "freebsd")
-  ELSEIF (UNIX)
-    SET (STAR_SYSTEM "unix")
-  ELSE ()
-    SET (STAR_SYSTEM "unknown")
-  ENDIF ()
+# System name and family
+IF (NOT DEFINED STAR_SYSTEM OR NOT DEFINED STAR_SYSTEM_FAMILY)
+    IF (WIN32)
+        SET (STAR_SYSTEM "windows")
+        SET (STAR_SYSTEM_FAMILY "windows")
+        SET_FLAG (STAR_SYSTEM_WINDOWS)
+        SET_FLAG (STAR_SYSTEM_FAMILY_WINDOWS)
+        # LUA_USE_WINDOWS is automatically defined in luaconf if _WIN32 is defined
+    ELSEIF (APPLE AND ${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
+        SET (STAR_SYSTEM "macos")
+        SET (STAR_SYSTEM_FAMILY "unix")
+        SET_FLAG (STAR_SYSTEM_MACOS)
+        SET_FLAG (STAR_SYSTEM_FAMILY_UNIX)
+        ADD_COMPILE_DEFINITIONS (LUA_USE_MACOSX)
+    ELSEIF (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+        SET (STAR_SYSTEM "linux")
+        SET (STAR_SYSTEM_FAMILY "unix")
+        SET_FLAG (STAR_SYSTEM_LINUX)
+        SET_FLAG (STAR_SYSTEM_FAMILY_UNIX)
+        ADD_COMPILE_DEFINITIONS (LUA_USE_LINUX)
+    ELSEIF (${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
+        SET (STAR_SYSTEM "freebsd")
+        SET (STAR_SYSTEM_FAMILY "unix")
+        SET_FLAG (STAR_SYSTEM_FREEBSD)
+        SET_FLAG (STAR_SYSTEM_FAMILY_UNIX)
+        ADD_COMPILE_DEFINITIONS (LUA_USE_POSIX)
+    ELSEIF (UNIX)
+        SET (STAR_SYSTEM "unix")
+        SET (STAR_SYSTEM_FAMILY "unix")
+        SET_FLAG (STAR_SYSTEM_FAMILY_UNIX)
+        ADD_COMPILE_DEFINITIONS (LUA_USE_POSIX)
+    ELSE ()
+        SET (STAR_SYSTEM "unknown")
+        SET (STAR_SYSTEM_FAMILY "unknown")
+    ENDIF ()
 ENDIF ()
 
-IF (NOT DEFINED STAR_SYSTEM_FAMILY)
-  IF (WIN32)
-    SET (STAR_SYSTEM_FAMILY "windows")
-  ELSEIF (UNIX)
-    SET (STAR_SYSTEM_FAMILY "unix")
-  ELSE ()
-    SET (STAR_SYSTEM_FAMILY "unknown")
-  ENDIF ()
-ENDIF ()
-
-# C/C++ compiler ID, like clang, gnu, or msvc
+# C/C++ Compiler
 IF (NOT DEFINED STAR_COMPILER)
-  IF (NOT CMAKE_C_COMPILER_ID STREQUAL CMAKE_CXX_COMPILER_ID)
-    MESSAGE (FATAL_ERROR "C and C++ compiler id do not match, unsupported build configuration")
-  ENDIF ()
+    IF (NOT CMAKE_C_COMPILER_ID STREQUAL CMAKE_CXX_COMPILER_ID)
+        MESSAGE (FATAL_ERROR "C and C++ compiler id do not match, unsupported build configuration")
+    ENDIF ()
 
-  IF (CMAKE_C_COMPILER_ID STREQUAL "Clang")
-    SET (STAR_COMPILER "clang")
-  ELSEIF (CMAKE_COMPILER_IS_GNUC)
-    SET (STAR_COMPILER "gnu")
-  ELSEIF (MSVC)
-    SET (STAR_COMPILER "msvc")
-  ELSE ()
-    STRING (TOLOWER "${CMAKE_C_COMPILER_ID}" STAR_COMPILER)
-  ENDIF ()
+    IF (CMAKE_C_COMPILER_ID STREQUAL "Clang")
+        SET (STAR_COMPILER "clang")
+        SET_FLAG (STAR_COMPILER_CLANG)
+    ELSEIF (CMAKE_COMPILER_IS_GNUC)
+        SET (STAR_COMPILER "gnu")
+        SET_FLAG (STAR_COMPILER_GNU)
+    ELSEIF (MSVC)
+        SET (STAR_COMPILER "msvc")
+        SET_FLAG (STAR_COMPILER_MSVC)
+    ELSE ()
+        STRING (TOLOWER "${CMAKE_C_COMPILER_ID}" STAR_COMPILER)
+    ENDIF ()
 ENDIF ()
 
-# Enable OPTIONs based on the discovered system / environment...
-
-IF (STAR_COMPILER STREQUAL "gnu")
-  OPTION (STAR_ENABLE_STATIC_LIBGCC_LIBSTDCXX "Statically link libgcc and libstdc++" OFF)
-  OPTION (STAR_ENABLE_GCC_PROFILING "Enable gcc/g++ profiling via the -pg flag" OFF)
-  OPTION (STAR_ENABLE_GLIBCXX_DEBUG "Enable _GLIBCXX_DEBUG for g++" OFF)
-ENDIF ()
-
-IF (STAR_COMPILER STREQUAL "msvc")
-  OPTION (STAR_ENABLE_STATIC_MSVC_RUNTIME "Statically link with the CRT" OFF)
-ENDIF ()
-
-OPTION (STAR_BUILD_GUI "Build GUI utilities and Client" ON)
-
-IF (STAR_BUILD_GUI)
-  OPTION (STAR_BUILD_QT_TOOLS "Build GUI utilities that require Qt" OFF)
-  OPTION (STAR_ENABLE_STEAM_INTEGRATION "Use Steam platform services" OFF)
-  OPTION (STAR_ENABLE_DISCORD_INTEGRATION "Use Discord platform services" OFF)
-ENDIF ()
-
-OPTION (STAR_LUA_APICHECK "Use lua api checks" OFF)
-OPTION (STAR_USE_JEMALLOC "Use jemalloc allocators" OFF)
-
-# Report all the discovered system / environment settings and all options.
-
+# Report results
 MESSAGE (STATUS "Source ID: ${STAR_SOURCE_IDENTIFIER}")
 MESSAGE (STATUS "Architecture: ${STAR_ARCHITECTURE}")
 MESSAGE (STATUS "Little Endian: ${STAR_LITTLE_ENDIAN}")
 MESSAGE (STATUS "System: ${STAR_SYSTEM}")
 MESSAGE (STATUS "System family: ${STAR_SYSTEM_FAMILY}")
 MESSAGE (STATUS "C/C++ compiler: ${STAR_COMPILER}")
+# =================================================================================================
 
-IF (DEFINED STAR_ENABLE_STATIC_LIBGCC_LIBSTDCXX)
-  MESSAGE (STATUS "Statically linking to libgcc / libstdc++: ${STAR_ENABLE_STATIC_LIBGCC_LIBSTDCXX}")
-ENDIF ()
 
-IF (DEFINED STAR_ENABLE_STATIC_MSVC_RUNTIME)
-  MESSAGE (STATUS "Statically linking to CRT: ${STAR_ENABLE_STATIC_MSVC_RUNTIME}")
-ENDIF ()
-
-IF (DEFINED STAR_ENABLE_GLIBCXX_DEBUG)
-  MESSAGE (STATUS "Enabling _GLIBCXX_DEBUG: ${STAR_ENABLE_GLIBCXX_DEBUG}")
-ENDIF ()
-
+# =================================================================================================
+# -- Configure / Build Options --------------------------------------------------------------------
+# -- Exposes relevant options based on the previously defined environment / system information
+# -- Generate flags and preprocessor definitions based on the options values.
+# =================================================================================================
+OPTION (STAR_BUILD_GUI "Build GUI utilities and Client" ON)
 MESSAGE (STATUS "Building GUI: ${STAR_BUILD_GUI}")
+IF (STAR_BUILD_GUI)
+    OPTION (STAR_BUILD_QT_TOOLS "Build GUI utilities that require Qt" OFF)
+    MESSAGE (STATUS "Building Qt tools: ${STAR_BUILD_QT_TOOLS}")
 
-IF (DEFINED STAR_BUILD_QT_TOOLS)
-  MESSAGE (STATUS "Building Qt tools: ${STAR_BUILD_QT_TOOLS}")
+    OPTION (STAR_ENABLE_STEAM_INTEGRATION "Use Steam platform services" OFF)
+    MESSAGE (STATUS "Using Steam platform services: ${STAR_ENABLE_STEAM_INTEGRATION}")
+    IF (STAR_ENABLE_STEAM_INTEGRATION)
+        ADD_COMPILE_DEFINITIONS (STAR_ENABLE_STEAM_INTEGRATION)
+    ENDIF ()
+
+    OPTION (STAR_ENABLE_DISCORD_INTEGRATION "Use Discord platform services" OFF)
+    MESSAGE (STATUS "Using Discrod platform services: ${STAR_ENABLE_DISCORD_INTEGRATION}")
+    IF (STAR_ENABLE_DISCORD_INTEGRATION)
+        ADD_COMPILE_DEFINITIONS (STAR_ENABLE_DISCORD_INTEGRATION)
+    ENDIF ()
 ENDIF ()
 
-IF (DEFINED STAR_ENABLE_STEAM_INTEGRATION)
-  MESSAGE (STATUS "Using Steam platform services: ${STAR_ENABLE_STEAM_INTEGRATION}")
-ENDIF ()
-
-IF (DEFINED STAR_ENABLE_DISCORD_INTEGRATION)
-  MESSAGE (STATUS "Using Discrod platform services: ${STAR_ENABLE_DISCORD_INTEGRATION}")
-ENDIF ()
-
+OPTION (STAR_LUA_APICHECK "Use lua api checks" OFF)
 MESSAGE (STATUS "Using Lua API checks: ${STAR_LUA_APICHECK}")
-MESSAGE (STATUS "Using jemalloc: ${STAR_USE_JEMALLOC}")
-
-# Set C defines and cmake variables based on the build settings we have now
-# determined...
-
-# Set a cmake variable to true and define a corresponding C/C++ definition
-FUNCTION (SET_FLAG flagValue)
-  SET (${flagValue} TRUE PARENT_SCOPE)
-  ADD_DEFINITIONS (-D${flagValue})
-ENDFUNCTION ()
-
-IF (STAR_LITTLE_ENDIAN)
-  SET_FLAG (STAR_LITTLE_ENDIAN)
-ELSEIF ()
-  SET_FLAG (STAR_BIG_ENDIAN)
-ENDIF ()
-
-IF (STAR_ARCHITECTURE STREQUAL "i386")
-  SET_FLAG (STAR_ARCHITECTURE_I386)
-ELSEIF (STAR_ARCHITECTURE STREQUAL "x86_64")
-  SET_FLAG (STAR_ARCHITECTURE_X86_64)
-ENDIF ()
-
-IF (STAR_SYSTEM STREQUAL "windows")
-  SET_FLAG (STAR_SYSTEM_WINDOWS)
-ELSEIF (STAR_SYSTEM STREQUAL "macos")
-  SET_FLAG (STAR_SYSTEM_MACOS)
-ELSEIF (STAR_SYSTEM STREQUAL "linux")
-  SET_FLAG (STAR_SYSTEM_LINUX)
-ELSEIF (STAR_SYSTEM STREQUAL "freebsd")
-  SET_FLAG (STAR_SYSTEM_FREEBSD)
-ENDIF ()
-
-IF (STAR_SYSTEM_FAMILY STREQUAL "windows")
-  SET_FLAG (STAR_SYSTEM_FAMILY_WINDOWS)
-ELSEIF (STAR_SYSTEM_FAMILY STREQUAL "unix")
-  SET_FLAG (STAR_SYSTEM_FAMILY_UNIX)
-ENDIF ()
-
-IF (STAR_COMPILER STREQUAL "gnu")
-  SET_FLAG (STAR_COMPILER_GNU)
-ELSEIF (STAR_COMPILER STREQUAL "clang")
-  SET_FLAG (STAR_COMPILER_CLANG)
-ELSEIF (STAR_COMPILER STREQUAL "msvc")
-  SET_FLAG (STAR_COMPILER_MSVC)
-ENDIF ()
-
 IF (STAR_LUA_APICHECK)
-  ADD_DEFINITIONS (-DLUA_USE_APICHECK)
+    ADD_COMPILE_DEFINITIONS (LUA_USE_APICHECK)
 ENDIF ()
 
-IF (STAR_SYSTEM_WINDOWS)
-  # LUA_USE_WINDOWS is automatically defined in luaconf if _WIN32 is defined
-ELSEIF (STAR_SYSTEM_MACOS)
-  ADD_DEFINITIONS(-DLUA_USE_MACOSX)
-ELSEIF (STAR_SYSTEM_LINUX)
-  ADD_DEFINITIONS(-DLUA_USE_LINUX)
-ELSEIF (STAR_SYSTEM_FAMILY_UNIX)
-  ADD_DEFINITIONS(-DLUA_USE_POSIX)
-ENDIF ()
-
-IF (STAR_ENABLE_STEAM_INTEGRATION)
-  ADD_DEFINITIONS (-DSTAR_ENABLE_STEAM_INTEGRATION)
-ENDIF ()
-
-IF (STAR_ENABLE_DISCORD_INTEGRATION)
-  ADD_DEFINITIONS (-DSTAR_ENABLE_DISCORD_INTEGRATION)
-ENDIF ()
-
+OPTION (STAR_USE_JEMALLOC "Use jemalloc allocators" OFF)
+MESSAGE (STATUS "Using jemalloc: ${STAR_USE_JEMALLOC}")
 IF (STAR_USE_JEMALLOC)
-  ADD_DEFINITIONS (-DSTAR_USE_JEMALLOC)
+    ADD_COMPILE_DEFINITIONS (STAR_USE_JEMALLOC)
 ENDIF ()
+
+# -- OPTIONs based on the discovered system / environment -----------------------------------------
+IF (STAR_COMPILER STREQUAL "gnu")
+    OPTION (STAR_ENABLE_GCC_PROFILING "Enable gcc/g++ profiling via the -pg flag" OFF)
+
+    OPTION (STAR_ENABLE_STATIC_LIBGCC_LIBSTDCXX "Statically link libgcc and libstdc++" OFF)
+    MESSAGE (STATUS "Statically linking to libgcc / libstdc++: ${STAR_ENABLE_STATIC_LIBGCC_LIBSTDCXX}")
+
+    OPTION (STAR_ENABLE_GLIBCXX_DEBUG "Enable _GLIBCXX_DEBUG for g++" OFF)
+    MESSAGE (STATUS "Enabling _GLIBCXX_DEBUG: ${STAR_ENABLE_GLIBCXX_DEBUG}")
+ENDIF ()
+
+IF (STAR_COMPILER STREQUAL "msvc")
+    OPTION (STAR_ENABLE_STATIC_MSVC_RUNTIME "Statically link with the CRT" OFF)
+    MESSAGE (STATUS "Statically linking to CRT: ${STAR_ENABLE_STATIC_MSVC_RUNTIME}")
+ENDIF ()
+# =================================================================================================
+
+
+
+# New recomendations
+# SET (LINKER_LANGUAGE CXX)
+# SET (CXX_STANDARD 17)
+# SET (CXX_STANDARD_REQUIRED ON)
+
 
 # Set C/C++ compiler flags based on build environment...
-
 IF (STAR_COMPILER_GNU)
-  SET (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wuninitialized -Wunreachable-code -Wformat -no-pie")
-  SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra -Wuninitialized -Wunreachable-code -Wformat -no-pie")
+  SET (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wuninitialized -Wunreachable-code -Wformat -Wno-unused -Wno-implicit-fallthrough -no-pie")
+  SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wall -Wextra -Wuninitialized -Wunreachable-code -Wformat -Wno-unused -Wno-implicit-fallthrough -no-pie")
 
   IF (STAR_SYSTEM_FAMILY_WINDOWS)
     SET (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mthreads")
@@ -250,11 +227,13 @@ IF (STAR_COMPILER_GNU)
 
 ELSEIF (STAR_COMPILER_CLANG)
   SET (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wuninitialized -Wno-parentheses-equality -Wno-deprecated-declarations")
-  SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra -Wuninitialized -Wno-parentheses-equality -Wno-deprecated-declarations")
+  SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wall -Wextra -Wuninitialized -Wno-parentheses-equality -Wno-deprecated-declarations")
 
   IF (STAR_SYSTEM_MACOS)
     SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-    SET (CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++14")
+    SET (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-export_dynamic")
+    SET (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-export_dynamic")
+    SET (CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++17")
     SET (CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
   ELSEIF ()
     SET (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread -D_REENTRANT")
@@ -340,7 +319,7 @@ ELSEIF (STAR_COMPILER_MSVC)
 
 ELSE ()
   SET (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -pthread -D_REENTRANT")
-  SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -pthread -D_REENTRANT")
+  SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wall -pthread -D_REENTRANT")
 
   SET (CMAKE_C_FLAGS_DEBUG "-g")
   SET (CMAKE_CXX_FLAGS_DEBUG "-g")
@@ -367,6 +346,7 @@ ELSEIF (STAR_SYSTEM_WINDOWS)
   SET (CMAKE_RC_COMPILE_OBJECT "<CMAKE_RC_COMPILER> <FLAGS> -O coff <DEFINES> -i <SOURCE> -o <OBJECT>")
 ENDIF ()
 
+SET (CMAKE_EXE_LINKER_FLAGS_RELWITHASSERTS "" CACHE STRING "" FORCE)
 IF (STAR_COMPILER STREQUAL "msvc")
   # /largeaddressaware - Make 32 bit build able to use 3GB addresses
   # /OPT:REF           - Eliminates functions and data that are never referenced

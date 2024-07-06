@@ -413,7 +413,7 @@ String String::lookupTags(Lookup&& lookup) const {
     }
   }
 
-  return move(finalString);
+  return std::move(finalString);
 }
 
 template <typename MapType>

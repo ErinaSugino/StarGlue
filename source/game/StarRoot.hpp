@@ -117,6 +117,11 @@ public:
   // in the given mod sources
   void reloadWithMods(StringList modDirectories);
 
+  // Appends the given mod sources on top of the base mod source specified in
+  // the settings. Does not trigger a reload, as this is intended to be called
+  // before assets() to sanely load all assets only once.
+  void loadMods(StringList modDirectories);
+
   // Ensures all Root members are loaded without waiting for them to be auto
   // loaded.
   void fullyLoad();

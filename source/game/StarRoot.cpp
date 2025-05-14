@@ -288,6 +288,10 @@ void Root::reloadWithMods(StringList modDirectories) {
   reload();
 }
 
+void Root::loadMods(StringList modDirectories) {
+    m_modDirectories = move(modDirectories);
+}
+
 void Root::fullyLoad() {
   auto workerPool = WorkerPool("Root::fullyLoad", RootLoadThreads);
   List<WorkerPoolHandle> loaders;
@@ -549,6 +553,7 @@ StringList Root::scanForAssetSources(StringList const& directories) {
   struct AssetSource {
     String path;
     Maybe<String> name;
+    Maybe<String> version;
     float priority;
     StringList requires;
     StringList includes;
@@ -588,6 +593,7 @@ StringList Root::scanForAssetSources(StringList const& directories) {
       auto assetSource = make_shared<AssetSource>();
       assetSource->path = fileName;
       assetSource->name = metadata.maybe("name").apply(mem_fn(&Json::toString));
+      assetSource->version = metadata.maybe("version").apply(mem_fn(&Json::printString));
       assetSource->priority = metadata.value("priority", 0.0f).toFloat();
       assetSource->requires = jsonToStringList(metadata.value("requires", JsonArray{}));
       assetSource->includes = jsonToStringList(metadata.value("includes", JsonArray{}));
@@ -624,14 +630,18 @@ StringList Root::scanForAssetSources(StringList const& directories) {
 
   HashSet<shared_ptr<AssetSource>> workingSet;
   OrderedHashSet<shared_ptr<AssetSource>> dependencySortedSources;
+  OrderedHashSet<shared_ptr<AssetSource>> excludedSources;
 
-  function<void(shared_ptr<AssetSource>)> dependencySortVisit;
+  function<bool(shared_ptr<AssetSource>)> dependencySortVisit;
   dependencySortVisit = [&](shared_ptr<AssetSource> source) {
     if (workingSet.contains(source))
       throw StarException("Asset dependencies form a cycle");
 
     if (dependencySortedSources.contains(source))
-      return;
+      return true;
+
+    if (excludedSources.contains(source))
+      return false;
 
     workingSet.add(source);
 
@@ -640,16 +650,24 @@ StringList Root::scanForAssetSources(StringList const& directories) {
         dependencySortVisit(*include);
     }
 
+    bool doAdd = true;
     for (auto const& requirementName : source->requires) {
-      if (auto requirement = namedSources.ptr(requirementName))
-        dependencySortVisit(*requirement);
-      else
-        throw StarException(strf("Asset source '%s' is missing dependency '%s'", *source->name, requirementName));
+        if (auto requirement = namedSources.ptr(requirementName))
+            //If requirement fails to load, this fails in chain.
+            doAdd = doAdd && dependencySortVisit(*requirement);
+        else {
+            //throw StarException(strf("Asset source '%s' is missing dependency '%s'", *source->name, requirementName));
+            Logger::error("Asset source '%s' is missing dependency '%s' - ignoring", *source->name, requirementName);
+            doAdd = false;
+            break;
+        }
     }
 
     workingSet.remove(source);
 
-    dependencySortedSources.add(move(source));
+    if (doAdd) dependencySortedSources.add(move(source));
+    else excludedSources.add(move(source));
+    return doAdd;
   };
 
   for (auto source : assetSources)
@@ -658,7 +676,7 @@ StringList Root::scanForAssetSources(StringList const& directories) {
   StringList sourcePaths;
   for (auto const& source : dependencySortedSources) {
     if (source->name)
-      Logger::info("Root: Detected asset source named '%s' at '%s'", *source->name, source->path);
+      Logger::info("Root: Detected asset source named '%s'%s at '%s'", *source->name, source->version ? strf(" version '%s'", *source->version) : "", source->path);
     else
       Logger::info("Root: Detected unnamed asset source at '%s'", source->path);
     sourcePaths.append(source->path);

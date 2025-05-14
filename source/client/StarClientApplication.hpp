@@ -55,6 +55,7 @@ private:
   void setError(String const& error);
   void setError(String const& error, std::exception const& e);
 
+  void loadUGCMods();
   void updateMods();
   void updateModsWarning();
   void updateSplash();

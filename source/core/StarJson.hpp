@@ -250,6 +250,8 @@ public:
   String repr(int pretty = 0, bool sort = false) const;
   // Prints JSON object or array only (only top level types allowed by JSON)
   String printJson(int pretty = 0, bool sort = false) const;
+  // Prints value as string, even if not originally string
+  String printString() const;
 
   // operator== and operator!= compare for exact equality with all types, and
   // additionally equality with numeric conversion with Int <-> Float

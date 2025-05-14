@@ -154,6 +154,8 @@ void ClientApplication::shutdown() {
 void ClientApplication::applicationInit(ApplicationControllerPtr appController) {
   Application::applicationInit(appController);
 
+  loadUGCMods();
+
   auto assets = m_root->assets();
   m_minInterfaceScale = assets->json("/interface.config:minInterfaceScale").toInt();
   m_maxInterfaceScale = assets->json("/interface.config:maxInterfaceScale").toInt();
@@ -218,7 +220,15 @@ void ClientApplication::renderInit(RendererPtr renderer) {
   if (m_worldPainter)
     m_worldPainter->renderInit(renderer);
 
-  changeState(MainAppState::Mods);
+  //changeState(MainAppState::Mods);
+  if (m_root->configuration()->get("modsWarningShown").optBool().value()) {
+      changeState(MainAppState::Splash);
+  }
+  else {
+      m_root->configuration()->set("modsWarningShown", true);
+      m_errorScreen->setMessage(m_root->assets()->json("/interface.config:modsWarningMessage").toString());
+      changeState(MainAppState::ModsWarning);
+  }
 }
 
 void ClientApplication::windowChanged(WindowMode windowMode, Vec2U screenSize) {
@@ -537,6 +547,31 @@ void ClientApplication::setError(String const& error, std::exception const& e) {
   Logger::error("%s\n%s", error, outputException(e, true));
   m_errorScreen->setMessage(strf("%s\n%s", error, outputException(e, false)));
   changeState(MainAppState::Error);
+}
+
+void ClientApplication::loadUGCMods() {
+    auto ugcService = appController()->userGeneratedContentService();
+    if (ugcService) {
+        while (!ugcService->triggerContentDownload()) {} // Wait for all downloads to finish
+        StringList modDirectories;
+        for (auto contentId : ugcService->subscribedContentIds()) {
+            if (auto contentDirectory = ugcService->contentDownloadDirectory(contentId)) {
+                Logger::info("Loading mods from user generated content with id '%s' from directory '%s'", contentId, *contentDirectory);
+                modDirectories.append(*contentDirectory);
+            }
+            else {
+                Logger::warn("User generated content with id '%s' is not available", contentId);
+            }
+        }
+
+        if (modDirectories.empty()) {
+            Logger::info("No subscribed user generated content");
+        }
+        else {
+            Logger::info("Reloading to include all user generated content");
+            Root::singleton().loadMods(modDirectories);
+        }
+    }
 }
 
 void ClientApplication::updateMods() {

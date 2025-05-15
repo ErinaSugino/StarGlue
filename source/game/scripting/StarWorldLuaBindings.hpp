@@ -153,6 +153,7 @@ namespace LuaBindings {
     RpcPromise<Vec2F> findUniqueEntity(World* world, String const& uniqueId);
     RpcPromise<Json> sendEntityMessage(World* world, LuaEngine& engine, LuaValue entityId, String const& message, LuaVariadic<Json> args);
     Maybe<bool> loungeableOccupied(World* world, EntityId entityId);
+    Maybe<bool> loungeableFullyOccupied(World* world, EntityId entityId);
     bool isMonster(World* world, EntityId entityId, Maybe<bool> const& aggressive);
     Maybe<String> monsterType(World* world, EntityId entityId);
     Maybe<String> npcType(World* world, EntityId entityId);

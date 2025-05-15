@@ -509,6 +509,7 @@ namespace LuaBindings {
     callbacks.registerCallbackWithSignature<RpcPromise<Vec2F>, String>("findUniqueEntity", bind(WorldEntityCallbacks::findUniqueEntity, world, _1));
     callbacks.registerCallbackWithSignature<RpcPromise<Json>, LuaEngine&, LuaValue, String, LuaVariadic<Json>>("sendEntityMessage", bind(WorldEntityCallbacks::sendEntityMessage, world, _1, _2, _3, _4));
     callbacks.registerCallbackWithSignature<Maybe<bool>, EntityId>("loungeableOccupied", bind(WorldEntityCallbacks::loungeableOccupied, world, _1));
+    callbacks.registerCallbackWithSignature<Maybe<bool>, EntityId>("loungeableFullyOccupied", bind(WorldEntityCallbacks::loungeableFullyOccupied, world, _1));
     callbacks.registerCallbackWithSignature<bool, EntityId, Maybe<bool>>("isMonster", bind(WorldEntityCallbacks::isMonster, world, _1, _2));
     callbacks.registerCallbackWithSignature<Maybe<String>, EntityId>("monsterType", bind(WorldEntityCallbacks::monsterType, world, _1));
     callbacks.registerCallbackWithSignature<Maybe<String>, EntityId>("npcType", bind(WorldEntityCallbacks::npcType, world, _1));
@@ -1740,6 +1741,18 @@ namespace LuaBindings {
     if (entity && entity->anchorCount() > 0)
       return !entity->entitiesLoungingIn(0).empty();
     return {};
+  }
+
+  Maybe<bool> WorldEntityCallbacks::loungeableFullyOccupied(World* world, EntityId entityId) {
+      auto entity = world->get<LoungeableEntity>(entityId);
+      if (entity && entity->anchorCount() > 0) {
+          for (int i = 0; i < entity->anchorCount(); i++) {
+              if (entity->entitiesLoungingIn(i).empty())
+                  return false;
+          }
+          return true;
+      }
+      return {};
   }
 
   bool WorldEntityCallbacks::isMonster(World* world, EntityId entityId, Maybe<bool> const& aggressive) {

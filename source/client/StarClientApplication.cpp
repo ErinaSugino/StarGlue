@@ -128,6 +128,7 @@ void ClientApplication::startup(StringList const& cmdLineArgs) {
   m_root = rootLoader.initOrDie(cmdLineArgs).first;
 
   Logger::info("Client Version %s (%s) Source ID: %s Protocol: %s", StarVersionString, StarArchitectureString, StarSourceIdentifierString, StarProtocolVersion);
+  Logger::info("StarGlue Version %s", StarGlueVersionString);
 }
 
 void ClientApplication::shutdown() {

@@ -5,6 +5,7 @@ namespace Star {
 
 void VersionOptionParser::printVersion(std::ostream& os) {
   format(os, "Starbound Version %s (%s)\n", StarVersionString, StarArchitectureString);
+  format(os, "StarGlue Version %s", StarGlueVersionString);
   format(os, "Source Identifier - %s\n", StarSourceIdentifierString);
 }
 

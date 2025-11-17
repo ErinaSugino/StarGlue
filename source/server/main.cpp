@@ -46,6 +46,7 @@ int main(int argc, char** argv) {
     auto configuration = root->configuration();
     {
       Logger::info("Server Version %s (%s) Source ID: %s Protocol: %s", StarVersionString, StarArchitectureString, StarSourceIdentifierString, StarProtocolVersion);
+      Logger::info("Server running StarGlue %s", StarGlueVersionString);
 
       UniverseServerUPtr server = make_unique<UniverseServer>(root->toStoragePath("universe"));
       server->setListeningTcp(true);

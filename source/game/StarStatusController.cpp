@@ -11,6 +11,7 @@
 #include "StarStatusEffectDatabase.hpp"
 #include "StarStatusEffectEntity.hpp"
 #include "StarLiquidsDatabase.hpp"
+#include "StarLogging.hpp"
 
 namespace Star {
 
@@ -88,10 +89,33 @@ void StatusController::diskLoad(Json const& store) {
 
   m_statusProperties.set(store.getObject("statusProperties"));
 
-  for (auto const& p : store.getObject("persistentEffectCategories", {}))
-    addPersistentEffects(p.first, p.second.toArray().transformed(jsonToPersistentStatusEffect));
+  for (auto const& p : store.getObject("persistentEffectCategories", {})) {
+      List<PersistentStatusEffect> effectList = p.second.toArray().transformed(jsonToPersistentStatusEffect);
+      for (PersistentStatusEffect const& effect : effectList) {
+          try {
+              addPersistentEffect(p.first, effect);
+          } catch (StatusEffectDatabaseException ex) {
+              Logger::error("Cannot load non-existent persistent status %s in %s, ignoring!", effect.is<UniqueStatusEffect>() ? "effect " + effect.get<UniqueStatusEffect>() : "modifier", p.first);
+          } catch (std::exception ex) {
+              Logger::error("Cannot load persistent status %s in %s; %s", effect.is<UniqueStatusEffect>() ? "effect " + effect.get<UniqueStatusEffect>() : "modifier", p.first, ex.what());
+          } catch (...) {
+              Logger::error("Cannot load persistent status %s in %s", effect.is<UniqueStatusEffect>() ? "effect " + effect.get<UniqueStatusEffect>() : "modifier", p.first);
+          }
+      }
+  }
 
-  addEphemeralEffects(store.getArray("ephemeralEffects").transformed(jsonToEphemeralStatusEffect));
+  for (Json const& json : store.getArray("ephemeralEffects", JsonArray())) {
+      EphemeralStatusEffect effect = jsonToEphemeralStatusEffect(json);
+      try {
+          addEphemeralEffect(effect);
+      } catch (StatusEffectDatabaseException ex) {
+          Logger::error("Cannot load non-existent ephemeral status effect %s, ignoring!", effect.uniqueEffect);
+      } catch (std::exception ex) {
+          Logger::error("Cannot load ephemeral status effect %s; %s", effect.uniqueEffect, ex.what());
+      } catch (...) {
+          Logger::error("Cannot load ephemeral status effect %s", effect.uniqueEffect);
+      }
+  }
 
   for (auto const& p : store.getObject("resourceValues", {})) {
     if (isResource(p.first))
